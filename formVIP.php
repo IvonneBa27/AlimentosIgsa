@@ -178,19 +178,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 
+
 $sql = "SELECT p.*, d.*, p.idPaciente AS pacienteID, d.idPaciente AS dietaID
 FROM pacientes p
 LEFT JOIN (
     SELECT d1.*
     FROM dietas d1
     INNER JOIN (
-        SELECT MAX(ID) AS ID, idPaciente
-        FROM dietas
-        WHERE area = 'PRIVADOS'
-        GROUP BY idPaciente
+    SELECT MAX(ID) AS ID, idPaciente
+    FROM dietas
+    WHERE area = 'PRIVADOS'
+    GROUP BY idPaciente
     ) d2 ON d1.ID = d2.ID
 ) d ON p.idPaciente = d.idPaciente
-WHERE p.statusP = 'Alta' AND p.area = 'PRIVADOS'";
+WHERE p.statusP = 'Alta' AND p.area = 'PRIVADOS'
+ORDER BY CAST(p.cama AS UNSIGNED) ASC";
+
 
 $query = mysqli_query($con, $sql);
 
@@ -384,9 +387,18 @@ if ($query->num_rows > 0) {
                                     <input type="number" class="form-control fs-5" id="idPaciente" name="idPaciente" required>
                                 </div>
 
-                                <div class="form-group col-md-9">
+                               <div class="form-group col-md-9">
                                     <label class="fs-5">Cama</label>
-                                    <input type="text" class="form-control fs-5" id="cama" required>
+                                    <select name="cama" id="cama" class="form-control fs-5" required>
+                                        <?php
+                                        $sqlCama = "SELECT numero FROM camas WHERE area = 'PRIVADOS'";
+                                        $queryCama = mysqli_query($con, $sqlCama);
+
+                                        while ($row = mysqli_fetch_assoc($queryCama)) {
+                                            echo '<option value="' . $row['numero'] . '">' . $row['numero'] . '</option>';
+                                        }
+                                        ?>
+                                    </select>
                                 </div>
 
                                 <div class="form-group col-md-9">

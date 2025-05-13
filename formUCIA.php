@@ -110,8 +110,6 @@ function guardarOActualizarDieta($idPaciente, $datos, $rangoHoraActual)
             mysqli_query($con, $sqlUpdate);
         }
 
-        //$sqlUpdate = "UPDATE dietas SET Nombre_Paciente = '$nombre', Fecha_Nacimiento_Paciente = '$fechaNacimiento', Cama_Paciente = '$cama', Edad = '$edad', Diag_Med_Nutri = '$diagnosticoMed', Prescripcion = '$prescripcionNutri', Desayuno = '$desayuno', Col_Matutina = '$colMatutina', Comida = '$comida', Col_Vespertina = '$colVespertina', Cena = '$cena', Col_Nocturna = '$colNocturna', Observaciones = '$observaciones', Control_Tamizaje = '$controlTamizaje', privados = '$vip', Fecha_Hora_Creacion = '$fechaHoraActual', Creado_por = '$usuario' WHERE idPaciente = '$idPaciente' AND DATE(Fecha_Hora_Creacion) = '$fechaHoy'";
-        //mysqli_query($con, $sqlUpdate);
     } else {
         // Insertar un nuevo registro
         $nombre = $datos['nombre'];
@@ -149,21 +147,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     exit;
 }
 
-// Consulta SQL para obtener los datos de los pacientes junto con las últimas dietas
-/*$sql = "
-    SELECT p.*, d.*, p.idPaciente AS pacienteID, d.idPaciente AS dietaID
-    FROM pacientes p
-    LEFT JOIN (
-        SELECT d1.*
-        FROM dietas d1
-        INNER JOIN (
-            SELECT MAX(ID) AS ID, idPaciente
-            FROM dietas
-            GROUP BY idPaciente
-        ) d2 ON d1.ID = d2.ID
-    ) d ON p.idPaciente = d.idPaciente
-    WHERE p.statusP = 'Alta'
-";*/
 
 $sql = "SELECT p.*, d.*, p.idPaciente AS pacienteID, d.idPaciente AS dietaID
 FROM pacientes p
@@ -177,7 +160,12 @@ LEFT JOIN (
         GROUP BY idPaciente
     ) d2 ON d1.ID = d2.ID
 ) d ON p.idPaciente = d.idPaciente
-WHERE p.statusP = 'Alta' AND p.area = 'UCIA'";
+WHERE p.statusP = 'Alta' AND p.area = 'UCIA'ORDER BY 
+CASE 
+ WHEN p.cama LIKE 'A-%' THEN 1
+ ELSE 2
+END, 
+p.cama ASC";
 
 $query = mysqli_query($con, $sql);
 
@@ -374,7 +362,16 @@ if ($query->num_rows > 0) {
 
                                 <div class="form-group col-md-9">
                                     <label class="fs-5">Cama</label>
-                                    <input type="text" class="form-control fs-5" id="cama" required>
+                                    <select name="cama" id="cama" class="form-control fs-5" required>
+                                        <?php
+                                        $sqlCama = "SELECT numero FROM camas WHERE area = 'UCIA'";
+                                        $queryCama = mysqli_query($con, $sqlCama);
+
+                                        while ($row = mysqli_fetch_assoc($queryCama)) {
+                                            echo '<option value="' . $row['numero'] . '">' . $row['numero'] . '</option>';
+                                        }
+                                        ?>
+                                    </select>
                                 </div>
 
                                 <div class="form-group col-md-9">

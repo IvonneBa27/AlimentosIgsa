@@ -190,7 +190,12 @@ LEFT JOIN (
         GROUP BY idPaciente
     ) d2 ON d1.ID = d2.ID
 ) d ON p.idPaciente = d.idPaciente
-WHERE p.statusP = 'Alta' AND p.area = 'CIRUGÍA GENERAL'";
+WHERE p.statusP = 'Alta' AND p.area = 'CIRUGÍA GENERAL' ORDER BY 
+CASE 
+ WHEN p.cama LIKE 'A-%' THEN 1
+ ELSE 2
+END, 
+p.cama ASC";
 
 $query = mysqli_query($con, $sql);
 
@@ -388,10 +393,20 @@ if ($query->num_rows > 0) {
                                     <input type="number" class="form-control fs-5" id="idPaciente" name="idPaciente" required>
                                 </div>
 
-                                <div class="form-group col-md-9">
+                               <div class="form-group col-md-9">
                                     <label class="fs-5">Cama</label>
-                                    <input type="text" class="form-control fs-5" id="cama" required>
+                                    <select name="cama" id="cama" class="form-control fs-5" required>
+                                        <?php
+                                        $sqlCama = "SELECT numero FROM camas WHERE area = 'CIRUGÍA GENERAL'";
+                                        $queryCama = mysqli_query($con, $sqlCama);
+
+                                        while ($row = mysqli_fetch_assoc($queryCama)) {
+                                            echo '<option value="' . $row['numero'] . '">' . $row['numero'] . '</option>';
+                                        }
+                                        ?>
+                                    </select>
                                 </div>
+
 
                                 <div class="form-group col-md-9">
                                     <label for="edadAnios" class="fs-5">Años</label>
