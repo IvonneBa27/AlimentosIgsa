@@ -45,8 +45,8 @@ $sesionNombre = $sesi['nombre'];   // Reemplaza con el nombre exacto de la colum
     <!-- ========== MAIN CONTENT ========== -->
     <main class="flex-grow-1 p-4">
       <div class="text-center mb-4">
-        <h1 class="display-4 fw-bold text-success">SISTEMA NUTRIGEST</h1>
-        <p class="lead">Gestión integral de dietas y alimentación saludable</p>
+        <h1 class="display-4 fw-bold text-success">Sistema NutrIGSA</h1>
+        <p class="lead">Gestión integral de dietas y alimentación</p>
       </div>
 
       <div id="nutrigestCarousel" class="carousel slide shadow rounded-4" data-bs-ride="carousel">

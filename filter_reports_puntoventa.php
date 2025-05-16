@@ -16,15 +16,21 @@ $params = [];
 // Base de la consulta
 $sql_base = "SELECT 
             cp.id, 
-            cp.barcode,
+            cp.barcode,            
+            es.nombre as establecimiento,
             pc.consumo as producto,
             pc.costo as importe,
-            cc.cantidad,
-            tp.nombre as tipo_pago
-            cc.fecha_registro
+            cp.cantidad,
+            (cp.cantidad * pc.costo) AS total,
+            tp.nombre as tipo_pago,
+            cp.folio,
+            cp.fecha_registro,
+            cs.status as estatus
         FROM control_puntoventa cp 
-        LEFT JOIN punto consumo pc ON cp.consumo_id = pc.id
+        LEFT JOIN punto_consumo pc ON cp.consumo_id = pc.id
         LEFT JOIN tipo_pago tp ON cp.tipo_pago = tp.id
+        LEFT JOIN establecimientos es ON es.id = pc.establecimiento_id
+        LEFT JOIN catalog_status cs ON cs.status_id = cp.estatus
 
         WHERE 1=1"; // <- para que puedas agregar más condiciones después
 
@@ -32,7 +38,7 @@ if ($fecha_inicio && $fecha_fin) {
     $fecha_inicio = date('Y-m-d', strtotime($fecha_inicio)) . ' 00:00:00';
     $fecha_fin = date('Y-m-d', strtotime($fecha_fin)) . ' 23:59:59';
 
-    $sql_base .= " AND cc.fecha_registro BETWEEN :fecha_inicio AND :fecha_fin";
+    $sql_base .= " AND cp.fecha_registro BETWEEN :fecha_inicio AND :fecha_fin";
     $params[':fecha_inicio'] = $fecha_inicio;
     $params[':fecha_fin'] = $fecha_fin;
 }
@@ -61,13 +67,15 @@ foreach ($registros as $registro) {
     $tabla .= '<tr>';
     $tabla .= "<td>{$registro['id']}</td>";
     $tabla .= "<td>{$registro['barcode']}</td>";
+    $tabla .= "<td>{$registro['establecimiento']}</td>";
     $tabla .= "<td>{$registro['producto']}</td>";
-    $tabla .= "<td>{$registro['empresa']}</td>";
-    $tabla .= "<td>{$registro['sala']}</td>";
-    $tabla .= "<td>{$registro['departamento']}</td>";
-    $tabla .= "<td>{$registro['solicitante']}</td>";
-    $tabla .= "<td>{$registro['cantidad']}</td>"; 
+    $tabla .= "<td>{$registro['importe']}</td>";
+    $tabla .= "<td>{$registro['cantidad']}</td>";
+    $tabla .= "<td>{$registro['total']}</td>";
+    $tabla .= "<td>{$registro['tipo_pago']}</td>";
+    $tabla .= "<td>{$registro['folio']}</td>";
     $tabla .= "<td>{$registro['fecha_registro']}</td>";
+    $tabla .= "<td>{$registro['estatus']}</td>";
     $tabla .= '</tr>';
 }
 
@@ -89,4 +97,3 @@ echo json_encode($response);
 if (json_last_error() !== JSON_ERROR_NONE) {
     echo 'JSON Error: ' . json_last_error_msg();
 }
-?>
