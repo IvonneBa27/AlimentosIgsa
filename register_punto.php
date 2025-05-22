@@ -11,6 +11,7 @@ if (!isset($_SESSION['resultado'])) {
 }
 
 $sesionUsuarioId = $sesi['id'];
+$sesionSitio = $sesi['sitio_id'];
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     try {
@@ -88,8 +89,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // Insertar en control_puntoventa
         $sql_punto_venta = "
             INSERT INTO control_puntoventa 
-            (barcode, consumo_id, cantidad, tipo_pago, fecha_registro, estatus, user_id)
-            VALUES (:barcode, :consumo_id, :cantidad, :tipo_pago, NOW(), 1, :user_id)
+            (barcode, consumo_id, cantidad, tipo_pago, fecha_registro, estatus, user_id, sitio_id)
+            VALUES (:barcode, :consumo_id, :cantidad, :tipo_pago, NOW(), 1, :user_id, :sitio_id)
         ";
         $stmt_punto_venta = $conn->prepare($sql_punto_venta);
         $stmt_punto_venta->bindParam(':barcode', $producto['barcode']);
@@ -97,6 +98,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt_punto_venta->bindParam(':cantidad', $cantidad);
         $stmt_punto_venta->bindParam(':tipo_pago', $tipo_pago);
         $stmt_punto_venta->bindParam(':user_id', $sesionUsuarioId);
+        $stmt_punto_venta->bindParam(':sitio_id', $sesionSitio);
         $stmt_punto_venta->execute();
 
         // Obtener registros del día actualizados
@@ -131,11 +133,13 @@ function obtenerRegistrosDia($conn, $returnData = false)
             tp.nombre AS nombre_tipo_pago,
             cpv.folio,
             cpv.fecha_registro,
-            cs.status AS estatus
+            cs.status AS estatus, 
+            si.nombre AS sitio
         FROM control_puntoventa cpv
         LEFT JOIN punto_consumo pc ON pc.id = cpv.consumo_id
         LEFT JOIN tipo_pago tp ON tp.id = cpv.tipo_pago
         LEFT JOIN catalog_status cs ON cpv.estatus = cs.status_id
+        LEFT JOIN sitios si ON cpv.sitio_id = si.id
         WHERE DATE(cpv.fecha_registro) = CURDATE()
         ORDER BY cpv.fecha_registro DESC
     ";

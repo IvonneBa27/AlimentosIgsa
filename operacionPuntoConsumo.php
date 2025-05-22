@@ -106,6 +106,7 @@ $tipoPagos = $stmtTipoPagos->fetchAll(PDO::FETCH_ASSOC);
                                 <th>Forma de pago</th>
                                 <th>Folio</th>
                                 <th>Fecha y Hora</th>
+                                 <th>Sitio</th>
                                 <th>Estatus</th>
                                 <th>Acción</th>
                             </tr>
@@ -377,6 +378,7 @@ $tipoPagos = $stmtTipoPagos->fetchAll(PDO::FETCH_ASSOC);
                                 <td>${tipoPagoHTML}</td>
                                 <td>${folioHTML}</td>
                                 <td>${registro.fecha_registro}</td>
+                                <td>${registro.sitio}</td>
                                 <td>${estatusHTML}</td>
                                <td>
                                     <button 
