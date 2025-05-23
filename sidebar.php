@@ -16,7 +16,22 @@ $sesi          = $_SESSION['resultado'];
 $sesionUsuario = $sesi['usuario'];
 $sesionNombre  = $sesi['nombre_completo'];
 $sesionRol     = $sesi['rol_id'];
-$sesionSitio     = $sesi['sitio_id'];
+$sesionSitio = $_SESSION['resultado']['sitio_id'];
+
+$sqlSitio = "SELECT nombre FROM sitios WHERE id = ?";
+$stmt = $con->prepare($sqlSitio);
+$stmt->bind_param("i", $sesionSitio);  // "i" significa entero
+$stmt->execute();
+$result = $stmt->get_result();
+
+$nombreSitio = "Desconocido";
+if ($row = $result->fetch_assoc()) {
+    $nombreSitio = $row['nombre'];
+}
+
+
+
+
 
 // 2) Traer módulos permitidos
 $modulos_permitidos = [];
@@ -68,17 +83,6 @@ foreach ($modulos_permitidos as $modulo) {
 
 
 
-$nombreSitio = '';
-
-// Consulta con PDO
-$sqlSitio = "SELECT nombre FROM sitios WHERE id = :id";
-$stmt = $conn->prepare($sqlSitio);
-$stmt->bindParam(':id', $sesionSitio, PDO::PARAM_INT);
-$stmt->execute();
-
-if ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-  $nombreSitio = $row['nombre'];
-}
 ?>
 
 
@@ -196,6 +200,7 @@ if ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         <div class="fw-semibold fs-5">IGSA Medical</div>
         <div class="text-muted small"><?= htmlspecialchars($sesionNombre) ?></div>
         <div class="text-muted small mb-2">Usuario: <?= htmlspecialchars($sesionUsuario) ?></div>
+
         <div class="text-muted small">Sitio: <?= htmlspecialchars($nombreSitio) ?></div>
         <a href="index.html" class="nav-link text-danger p-0">
           <i class="bi bi-box-arrow-right me-1"></i> Cerrar sesión
