@@ -81,7 +81,7 @@ include 'db_connection.php';
                     </div>
                     <div class="col-md-6"></div>
                     <div class="col-md-12 d-flex align-items-end mb-12">
-             
+
                     </div>
 
                     <div class="col-md-3 d-flex align-items-end mb-3">
@@ -92,7 +92,7 @@ include 'db_connection.php';
                     </div>
                     <div class="col-md-3 d-flex align-items-end mb-3">
                         <button type="button" id="btn-correo" class="btn btn-warning w-100" data-bs-toggle="modal" data-bs-target="#modalEnviarCorreo">
-                            Enviar por correo 
+                            Enviar por correo
                         </button>
                     </div>
                 </div>
@@ -106,12 +106,16 @@ include 'db_connection.php';
                         <tr>
                             <th>ID</th>
                             <th>Codigo</th>
+                            <th>Establecimiento</th>
                             <th>Producto</th>
                             <th>Importe</th>
                             <th>Cantidad</th>
                             <th>Total</th>
                             <th>Forma de pago</th>
+                            <th>Folio</th>
                             <th>Fecha de Registro</th>
+                            <th>Estatus</th>
+
                         </tr>
                     </thead>
                     <tbody id="tabla-registros">
@@ -163,7 +167,7 @@ include 'db_connection.php';
                 };
 
                 $.ajax({
-                    url: 'filter_reports_punto_consumo.php',
+                    url: 'filter_reports_puntoventa.php',
                     type: 'POST',
                     data: filtros,
                     dataType: 'json',
@@ -191,7 +195,7 @@ include 'db_connection.php';
             });
 
             $('#btn-exportar').on('click', function() {
-                window.location.href = 'exportar_excel.php?' + $('#filtro-form').serialize();
+                window.location.href = 'exportar_excel_punto_venta.php?' + $('#filtro-form').serialize();
             });
 
             $('#btn-enviar-correo').on('click', function() {
@@ -201,7 +205,7 @@ include 'db_connection.php';
                     return;
                 }
                 const filtros = $('#filtro-form').serialize();
-                $.post('enviar_correo.php', {
+                $.post('enviar_correo_punto_venta.php', {
                     correos,
                     filtros
                 }, function(response) {

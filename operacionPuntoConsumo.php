@@ -104,7 +104,9 @@ $tipoPagos = $stmtTipoPagos->fetchAll(PDO::FETCH_ASSOC);
                                 <th>Cantidad</th>
                                 <th>Cantidad</th>
                                 <th>Forma de pago</th>
+                                <th>Folio</th>
                                 <th>Fecha y Hora</th>
+                                 <th>Sitio</th>
                                 <th>Estatus</th>
                                 <th>Acción</th>
                             </tr>
@@ -151,25 +153,52 @@ $tipoPagos = $stmtTipoPagos->fetchAll(PDO::FETCH_ASSOC);
                     </div>
                 </div>
             </div>
+            <!-- Modal para editar el folio -->
+            <div class="modal fade" id="modal-editar-folio" tabindex="-1" aria-labelledby="modalEditarFolioLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <form id="form-editar-folio">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="modalEditarFolioLabel">Folio</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                            </div>
+                            <div class="modal-body">
+                                <input type="hidden" name="id" id="editar-folio-id">
+
+                                <div class="mb-3">
+                                    <label for="editar-folio-folio" class="form-label">Folio</label>
+                                    <input type="text" class="form-control" id="folio" name="folio" id="editar-folio-folio" required>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                                <button type="submit" class="btn btn-primary" id="guardar-folio">Guardar cambios</button>
+
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
 
 
             <!-- Modal para cambiar el estatus a "BAJA" -->
 
+            <!-- Modal para cambiar el estatus a "BAJA" -->
             <div class="modal fade" id="deleteComensalModal" tabindex="-1" aria-labelledby="deleteComensalModalLabel" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title" id="deleteComensalModalLabel">Confirmación de Baja</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            <h5 class="modal-title" id="deleteComensalModalLabel">Cancelación del servicio</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                         </div>
                         <div class="modal-body">
                             ¿Estás seguro de que deseas cancelar el servicio?
                         </div>
                         <div class="modal-footer">
-                            <form action="delete_control_food.php" method="POST">
-                                <input type="hidden" name="id" id="id">
+                            <form action="delete_control_puntoventa.php" method="POST">
+                                <input type="hidden" name="id" id="delete-comensal-id">
                                 <button type="submit" class="btn btn-danger">Sí, confirmar</button>
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No, volver</button>
                             </form>
                         </div>
                     </div>
@@ -177,65 +206,58 @@ $tipoPagos = $stmtTipoPagos->fetchAll(PDO::FETCH_ASSOC);
             </div>
 
 
+
             <!-- Sticky Footer -->
             <?php //include 'footer.php'; 
             ?>
 
+
+
             <!-- Scripts -->
             <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
             <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
             <script>
                 $(document).ready(function() {
                     let barcodeTimeout;
 
-
+                    // Cargar registros al iniciar
                     cargarRegistros();
-                    // Evento cuando el usuario escanea el código de barras
+
+                    // Evento: escaneo de código de barras
                     $('#barcodeInput').on('input', function() {
-                        clearTimeout(barcodeTimeout); // Limpiar timeout anterior
+                        clearTimeout(barcodeTimeout);
                         const barcode = $(this).val().trim();
 
-                        if (barcode.length === 12) { // Ajusta la longitud si es diferente
-                            console.log("Código detectado, esperando 1 segundo antes de procesar...");
+                        if (barcode.length === 12) {
+                            console.log("Código detectado, esperando 1 segundo...");
 
-                            $('#barcodeInput').prop('disabled', true); // Bloquear input temporalmente
+                            $('#barcodeInput').prop('disabled', true);
 
                             barcodeTimeout = setTimeout(() => {
                                 console.log("Procesando código:", barcode);
-
-                                // Guardamos el código en el input oculto
                                 $('#codigoBarras').val(barcode);
-
-                                // Mostrar el modal de registro
                                 new bootstrap.Modal(document.getElementById("registroModal")).show();
-
-                                // Reactivar el input y limpiar su valor
                                 $('#barcodeInput').prop('disabled', false).val('');
-
                             }, 1000);
                         }
                     });
 
-                    // Evento cuando se hace clic en el botón "Confirmar"
+                    // Evento: confirmar registro
                     $("#confirmarRegistro").click(function(e) {
-                        e.preventDefault(); // Evita que el formulario se envíe normalmente
+                        e.preventDefault();
 
-                        // Obtener los datos del formulario
-                        var formData = {
+                        const formData = {
                             barcode: $("#codigoBarras").val(),
                             tipo_pago: $("#tipo_pago").val(),
                             cantidad: $("#cantidad").val()
                         };
 
-                        console.log("Enviando datos:", formData);
-
-                        // Validar que los campos obligatorios no estén vacíos
                         if (!formData.tipo_pago || !formData.cantidad) {
                             alert("Por favor, complete todos los campos.");
                             return;
                         }
 
-                        // Enviar datos con AJAX
                         $.ajax({
                             type: "POST",
                             url: "register_punto.php",
@@ -243,24 +265,77 @@ $tipoPagos = $stmtTipoPagos->fetchAll(PDO::FETCH_ASSOC);
                             dataType: "json",
                             success: function(response) {
                                 console.log("Respuesta del servidor:", response);
-
                                 if (response.success) {
-                                    alert(response.message); // Mostrar mensaje de éxito
-                                    $("#registroModal").modal("hide"); // Cerrar modal
-                                    $("#barcodeInput").val(""); // Limpiar input del código de barras
-                                    cargarRegistros(); // Recargar tabla de registros
+                                    alert(response.message);
+                                    $("#registroModal").modal("hide");
+                                    $("#barcodeInput").val('');
+                                    cargarRegistros();
                                 } else {
-                                    alert(response.message); // Mostrar mensaje de error
+                                    alert(response.message);
                                 }
                             },
-                            error: function(xhr, status, error) {
-                                console.error("Error en la petición:", xhr.responseText);
+                            error: function(xhr) {
+                                console.error("Error:", xhr.responseText);
                                 alert("Ocurrió un error al registrar la venta.");
                             }
                         });
                     });
 
-                    // Función para cargar registros en la tabla
+                    // Evento: guardar folio desde el modal
+                    $("#guardar-folio").on("click", function(e) {
+                        e.preventDefault();
+
+                        const id = $("#modal-editar-folio input[name='id']").val();
+                        const folio = $("#modal-editar-folio input[name='folio']").val().trim();
+
+                        if (folio === "") {
+                            alert("El folio no puede estar vacío.");
+                            return;
+                        }
+
+                        console.log("Actualizando folio:", {
+                            id,
+                            folio
+                        });
+
+                        $.ajax({
+                            url: "register_punto.php",
+                            type: "POST",
+                            dataType: "json",
+                            data: {
+                                action: "actualizar_folio",
+                                id: id,
+                                folio: folio
+                            },
+                            success: function(response) {
+                                console.log("Actualizando folio:", {
+                                    id,
+                                    folio
+                                });
+
+                                console.log("Respuesta de actualizar_folio:", response);
+                                if (response.success) {
+                                    alert(response.message);
+                                    $("#modal-editar-folio").modal("hide");
+                                    cargarRegistros();
+                                } else {
+                                    alert("Error: " + response.message);
+                                }
+                            },
+                            error: function(xhr) {
+                                console.error("Error en AJAX:", xhr.responseText);
+                                alert("Hubo un error al intentar actualizar el folio.");
+                            }
+                        });
+                    });
+
+                    //Cancelacion de producto.
+                    $(document).on('click', '.btn-cancelar-servicio', function() {
+                        var id = $(this).data('id');
+                        $('#delete-comensal-id').val(id);
+                    });
+
+                    // Función: cargar registros en la tabla
                     function cargarRegistros() {
                         $.ajax({
                             url: "register_punto.php",
@@ -271,12 +346,27 @@ $tipoPagos = $stmtTipoPagos->fetchAll(PDO::FETCH_ASSOC);
                             dataType: "json",
                             success: function(response) {
                                 if (response.success) {
-                                    var tbody = $("#registros-table tbody");
+                                    const tbody = $("#registros-table tbody");
                                     tbody.empty();
-                                    response.data.registros_dia.forEach(function(registro, index) {
-                                        let estatusHTML = `<span class="badge badge-secondary">${registro.estatus}</span>`;
+
+                                    response.data.registros_dia.forEach(function(registro) {
+                                        // Etiqueta de estatus
+                                        let estatusHTML = `<span class="badge bg-secondary">${registro.estatus}</span>`;
                                         if (registro.estatus === 'ACTIVO') estatusHTML = '<span class="badge bg-success">ACTIVO</span>';
                                         if (registro.estatus === 'CANCELADO') estatusHTML = '<span class="badge bg-danger">CANCELADO</span>';
+
+                                        // Tipo de pago con ícono si aplica
+                                        let tipoPagoHTML = registro.nombre_tipo_pago;
+                                        const esTarjeta = ['TARJETA DE CRÉDITO', 'TARJETA DE DÉBITO'].includes(registro.nombre_tipo_pago);
+                                        if (esTarjeta) {
+                                            tipoPagoHTML += ` <i class="bi bi-pencil-square text-primary editar-folio" style="cursor:pointer;" 
+                                data-id="${registro.id}" data-folio="${registro.folio ?? ''}"></i>`;
+                                        }
+
+                                        // Folio (solo si no es null)
+                                        let folioHTML = registro.folio !== null ? registro.folio : '';
+
+                                        // Agregar fila
                                         tbody.append(`
                             <tr>
                                 <td>${registro.id}</td>
@@ -285,20 +375,41 @@ $tipoPagos = $stmtTipoPagos->fetchAll(PDO::FETCH_ASSOC);
                                 <td>${registro.costo}</td>
                                 <td>${registro.cantidad}</td>
                                 <td>${registro.total}</td>
-                                <td>${registro.nombre_tipo_pago}</td>
-                         
+                                <td>${tipoPagoHTML}</td>
+                                <td>${folioHTML}</td>
                                 <td>${registro.fecha_registro}</td>
+                                <td>${registro.sitio}</td>
                                 <td>${estatusHTML}</td>
-                                <td><button class="btn btn-danger btn-sm">Cancelar</button></td>
+                               <td>
+                                    <button 
+                                        class="btn btn-dark btn-sm btn-cancelar-servicio" 
+                                        data-id="${registro.id}" 
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#deleteComensalModal">
+                                        Cancelar
+                                    </button>
+                                </td>
+
                             </tr>
                         `);
                                     });
+
+                                    // Evento para abrir el modal al hacer clic en ícono de editar folio
+                                    $(".editar-folio").on("click", function() {
+                                        const id = $(this).data("id");
+                                        const folio = $(this).data("folio");
+
+                                        $("#modal-editar-folio input[name='id']").val(id);
+                                        $("#modal-editar-folio input[name='folio']").val(folio);
+                                        $("#modal-editar-folio").modal("show");
+                                    });
+                                } else {
+                                    console.warn("No se pudieron cargar los registros:", response.message);
                                 }
+                            },
+                            error: function(xhr) {
+                                console.error("Error al cargar registros:", xhr.responseText);
                             }
-
-
-
-
                         });
                     }
                 });
@@ -311,11 +422,12 @@ $tipoPagos = $stmtTipoPagos->fetchAll(PDO::FETCH_ASSOC);
 
 
 
-
         </main>
 
     </div>
 
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
     <script src="node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="node_modules/chart.js/dist/chart.umd.js"></script>
     <script src="js/sidebars.js"></script>

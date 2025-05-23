@@ -140,7 +140,7 @@ $empresas = $stmtEmpresas->fetchAll(PDO::FETCH_ASSOC);
 
             <br>
 
-            <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+            <div class="table-responsive" style="max-height: 800px; overflow-y: auto;">
                 <table class="table table-striped ">
                     <thead class="table-dark">
                         <tr>
@@ -337,6 +337,48 @@ $empresas = $stmtEmpresas->fetchAll(PDO::FETCH_ASSOC);
                                 </div>
                             </div>
                         </div>
+                        <!-- Tiempos de Comida -->
+                        <div class="card mb-3">
+                            <h5 class="card-header">Tiempos de Comida</h5>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="tiempos_comida[]" value="Desayuno" id="desayuno">
+                                            <label class="form-check-label" for="desayuno">
+                                                Desayuno
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="tiempos_comida[]" value="Comida" id="comida">
+                                            <label class="form-check-label" for="comida">
+                                                Comida
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="tiempos_comida[]" value="Cena" id="cena">
+                                            <label class="form-check-label" for="cena">
+                                                Cena
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="tiempos_comida[]" value="Colación" id="colacion">
+                                            <label class="form-check-label" for="colacion">
+                                                Colación
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
 
                         <button type="submit" class="btn btn-success">Guardar</button>
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>

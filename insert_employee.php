@@ -10,9 +10,10 @@ if (!isset($_SESSION['resultado'])) {
     $sesi = $_SESSION['resultado'];
 }
 
-$sesionUsuario = $sesi[1];
-$sesionNombre = $sesi[3];
-$sesionCargo = $sesi[4];
+$sesi = $_SESSION['resultado'];
+    $sesionUsuario = $sesi['usuario']; // Reemplaza con el nombre exacto de la columna
+    $sesionNombre = $sesi['nombre'];   // Reemplaza con el nombre exacto de la columna
+    $sesionUsuarioId = $sesi['id']; 
 
 require 'vendor/autoload.php';
 

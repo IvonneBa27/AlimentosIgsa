@@ -16,6 +16,22 @@ $sesi          = $_SESSION['resultado'];
 $sesionUsuario = $sesi['usuario'];
 $sesionNombre  = $sesi['nombre_completo'];
 $sesionRol     = $sesi['rol_id'];
+$sesionSitio = $_SESSION['resultado']['sitio_id'];
+
+$sqlSitio = "SELECT nombre FROM sitios WHERE id = ?";
+$stmt = $con->prepare($sqlSitio);
+$stmt->bind_param("i", $sesionSitio);  // "i" significa entero
+$stmt->execute();
+$result = $stmt->get_result();
+
+$nombreSitio = "Desconocido";
+if ($row = $result->fetch_assoc()) {
+    $nombreSitio = $row['nombre'];
+}
+
+
+
+
 
 // 2) Traer módulos permitidos
 $modulos_permitidos = [];
@@ -64,7 +80,12 @@ foreach ($modulos_permitidos as $modulo) {
     ];
   }
 }
+
+
+
 ?>
+
+
 <!DOCTYPE html>
 <html lang="es">
 
@@ -179,6 +200,8 @@ foreach ($modulos_permitidos as $modulo) {
         <div class="fw-semibold fs-5">IGSA Medical</div>
         <div class="text-muted small"><?= htmlspecialchars($sesionNombre) ?></div>
         <div class="text-muted small mb-2">Usuario: <?= htmlspecialchars($sesionUsuario) ?></div>
+
+        <div class="text-muted small">Sitio: <?= htmlspecialchars($nombreSitio) ?></div>
         <a href="index.html" class="nav-link text-danger p-0">
           <i class="bi bi-box-arrow-right me-1"></i> Cerrar sesión
         </a>
@@ -267,8 +290,8 @@ foreach ($modulos_permitidos as $modulo) {
         <!-- Pie del modal -->
         <div class="modal-footer d-flex justify-content-between px-4 py-3">
           <button type="submit" class="btn btn-success btn-lg px-4" form="myFormUpdate">Actualizar</button>
-       <!-- Botón Cancelar -->
-<button type="button" class="btn btn-outline-secondary btn-lg" data-bs-dismiss="modal">Cancelar</button>
+          <!-- Botón Cancelar -->
+          <button type="button" class="btn btn-outline-secondary btn-lg" data-bs-dismiss="modal">Cancelar</button>
         </div>
 
       </div>
@@ -286,44 +309,44 @@ foreach ($modulos_permitidos as $modulo) {
   <!-- Bootstrap JS (versión 4 o compatible con tu HTML) -->
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
   <script>
-  // Mostrar/ocultar contraseñas
-  document.getElementById('showPasswords').addEventListener('change', function () {
-    const actual = document.getElementById('actual');
-    const nueva = document.getElementById('nueva');
-    const type = this.checked ? 'text' : 'password';
-    actual.type = type;
-    nueva.type = type;
-  });
-
-  // Enviar formulario con AJAX
-  $("#myFormUpdate").on("submit", function (e) {
-    e.preventDefault();
-
-    $.ajax({
-      url: "updatePassword.php",
-      type: "POST",
-      data: $(this).serialize(),
-      dataType: "json",
-      success: function (response) {
-        if (response.status === "success") {
-          alert("✅ " + response.message);
-          $("#myModalUpdate").modal("hide");
-
-          // Espera 1.5 segundos antes de cerrar sesión
-          setTimeout(function () {
-            window.location.href = "dashboard.php"; // o login.php
-          }, 1500);
-
-        } else {
-          alert("❌ " + response.message);
-        }
-      },
-      error: function () {
-        alert("⚠️ Error en la conexión con el servidor");
-      }
+    // Mostrar/ocultar contraseñas
+    document.getElementById('showPasswords').addEventListener('change', function() {
+      const actual = document.getElementById('actual');
+      const nueva = document.getElementById('nueva');
+      const type = this.checked ? 'text' : 'password';
+      actual.type = type;
+      nueva.type = type;
     });
-  });
-</script>
+
+    // Enviar formulario con AJAX
+    $("#myFormUpdate").on("submit", function(e) {
+      e.preventDefault();
+
+      $.ajax({
+        url: "updatePassword.php",
+        type: "POST",
+        data: $(this).serialize(),
+        dataType: "json",
+        success: function(response) {
+          if (response.status === "success") {
+            alert("✅ " + response.message);
+            $("#myModalUpdate").modal("hide");
+
+            // Espera 1.5 segundos antes de cerrar sesión
+            setTimeout(function() {
+              window.location.href = "dashboard.php"; // o login.php
+            }, 1500);
+
+          } else {
+            alert("❌ " + response.message);
+          }
+        },
+        error: function() {
+          alert("⚠️ Error en la conexión con el servidor");
+        }
+      });
+    });
+  </script>
 
 
 
