@@ -36,7 +36,24 @@ $page = isset($_GET['page']) ? $_GET['page'] : 1;
 $start_from = ($page - 1) * $results_per_page;
 
 // Modificar la consulta para limitar los resultados
-$consulta = "SELECT * FROM dietas WHERE area = 'CIRUGÍA GENERAL' AND DATE (Fecha_Hora_Creacion) = '$fechaFiltro' ORDER BY ID DESC LIMIT $start_from, $results_per_page";
+/*$consulta = "SELECT * FROM dietas WHERE area = 'CIRUGÍA GENERAL' AND DATE (Fecha_Hora_Creacion) = '$fechaFiltro' 
+ORDER BY ID DESC LIMIT $start_from, $results_per_page";*/
+$consulta = "SELECT * FROM dietas p 
+WHERE area = 'CIRUGÍA GENERAL' 
+  AND DATE(Fecha_Hora_Creacion) = '$fechaFiltro' 
+ORDER BY 
+  CASE 
+    WHEN p.Cama_Paciente LIKE 'A-%' THEN 1
+    ELSE 2
+  END,
+  CAST(
+    CASE 
+      WHEN p.Cama_Paciente LIKE '%-%' THEN SUBSTRING_INDEX(p.Cama_Paciente, '-', -1)
+      ELSE p.Cama_Paciente
+    END AS UNSIGNED
+  )
+LIMIT $start_from, $results_per_page";
+
 
 $query = mysqli_query($con, $consulta);
 

@@ -45,7 +45,7 @@ function resaltarTextarea(rango) {
 
     // Primero, elimina el estilo de resaltado de todos los td
     var tds = document.querySelectorAll('td');
-    tds.forEach(function(td) {
+    tds.forEach(function (td) {
         td.style.border = ''; // Elimina el borde
     });
 
@@ -55,16 +55,16 @@ function resaltarTextarea(rango) {
         //console.log('TDs encontrados:', tds); // Depuración
 
         if (tds.length > 0) {
-             // Aplica el borde superior al primer td
-             tds[0].style.borderTop = '5px solid green';
-             //console.log('Borde superior aplicado al primer td:', tds[0]); // Depuración
+            // Aplica el borde superior al primer td
+            tds[0].style.borderTop = '5px solid green';
+            //console.log('Borde superior aplicado al primer td:', tds[0]); // Depuración
 
             // Aplica el borde inferior al último td
             tds[tds.length - 1].style.borderBottom = '5px solid green';
             //console.log('Borde inferior aplicado al último td:', tds[tds.length - 1]); // Depuración
 
             // Aplica los bordes laterales a todos los td
-            tds.forEach(function(td) {
+            tds.forEach(function (td) {
                 td.style.borderLeft = '5px solid green';
                 td.style.borderRight = '5px solid green';
                 //console.log('Bordes laterales aplicados a:', td); // Depuración
@@ -173,6 +173,10 @@ function submitForm() {
                     //window.location.replace("http://10.1.7.169/dietas/formG.php");
 
                 } else if (text.includes('El ID ingresado para paciente ya existe')) {
+                    alert(text);
+                } else if (text.includes('Las siguientes camas no existen en el área de GINECOLOGÍA')) {
+                    alert(text);
+                } else if (text.includes('La cama ingresada ya existe en el área de GINECOLOGÍA')) {
                     alert(text);
                 } else {
                     alert('Error al subir el archivo.');
@@ -311,20 +315,20 @@ document.getElementById('fechaNac').addEventListener('change', function () {
 
 
 
-document.getElementById('configLink').addEventListener('click', function(event) {
+document.getElementById('configLink').addEventListener('click', function (event) {
     event.preventDefault();
     var myModal = new bootstrap.Modal(document.getElementById('myModalUpdate'));
     myModal.show();
 });
 
-document.getElementById('showPasswords').addEventListener('change', function() {
+document.getElementById('showPasswords').addEventListener('change', function () {
     var passwordFields = document.querySelectorAll('#actual, #nueva');
-    passwordFields.forEach(function(field) {
+    passwordFields.forEach(function (field) {
         field.type = this.checked ? 'text' : 'password';
     }, this);
 });
 
-document.getElementById('cancelButton').addEventListener('click', function() {
+document.getElementById('cancelButton').addEventListener('click', function () {
     // Limpiar los campos de entrada
     document.getElementById('myFormUpdate').reset();
     // Cerrar el modal

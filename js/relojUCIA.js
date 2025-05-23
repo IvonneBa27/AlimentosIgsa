@@ -179,6 +179,10 @@ function submitForm() {
 
                 } else if (text.includes('El ID ingresado para paciente ya existe')) {
                     alert(text);
+                } else if (text.includes('Las siguientes camas no existen en el área de UCIA')) {
+                    alert(text);
+                } else if (text.includes('La cama ingresada ya existe en el área de UCIA')) {
+                    alert(text);
                 } else {
                     alert('Error al subir el archivo.');
                 }

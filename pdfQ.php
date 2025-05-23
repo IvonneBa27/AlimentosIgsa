@@ -27,7 +27,7 @@ LEFT JOIN (
         GROUP BY idPaciente
     ) d2 ON d1.ID = d2.ID
 ) d ON p.idPaciente = d.idPaciente
-WHERE p.statusP = 'Alta' AND p.area = 'QUEMADOS'";
+WHERE p.statusP = 'Activo' AND p.area = 'QUEMADOS'";
 
     
 $query = mysqli_query($con, $sql);

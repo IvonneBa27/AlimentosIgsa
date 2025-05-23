@@ -1,8 +1,6 @@
 <?php
-// Configuración de la base de datos
 include('conexion.php');
 
-// Obtener los datos del formulario
 $nombrePaciente = $_POST['nombrePaciente'];
 $fechaNac = $_POST['fechaNac'];
 $idPaciente = $_POST['idPaciente'];
@@ -28,12 +26,13 @@ if ($query1->num_rows > 0) {
 
     $response['status'] = 'error';
     $response['message'] = 'El ID ingresado para paciente ya existe, valide los datos';
-} else {
-    $camaQuery = "SELECT * FROM pacientes WHERE cama = '$cama' AND area = 'CIRUGÍA GENERAL'";
+
+} else {    
+    $camaQuery = "SELECT * FROM pacientes WHERE cama = '$cama' AND area = 'CIRUGÍA GENERAL' AND statusP = 'Activo'";
     $query2 = mysqli_query($con, $camaQuery);
 
     if ($query2->num_rows > 0) {
-
+  
         $response['status'] = 'error';
         $response['message'] = 'La cama ingresada ya está ocupada en el área de CIRUGÍA GENERAL, por favor elija otra cama';
     } else {
@@ -53,6 +52,15 @@ if ($query1->num_rows > 0) {
     }
 }
 
-
-
 echo json_encode($response);
+
+
+
+
+
+
+
+
+
+
+

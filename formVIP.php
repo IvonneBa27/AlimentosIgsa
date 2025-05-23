@@ -191,7 +191,7 @@ LEFT JOIN (
     GROUP BY idPaciente
     ) d2 ON d1.ID = d2.ID
 ) d ON p.idPaciente = d.idPaciente
-WHERE p.statusP = 'Alta' AND p.area = 'PRIVADOS'
+WHERE p.statusP = 'Activo' AND p.area = 'PRIVADOS'
 ORDER BY CAST(p.cama AS UNSIGNED) ASC";
 
 
@@ -217,6 +217,38 @@ if ($query->num_rows > 0) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>D I E T A S </title>
     <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <style>
+        /* Permitir que los textarea se redimensionen libremente */
+        .table-textarea {
+            resize: both;
+            /* Permite redimensionar en ambas direcciones */
+            overflow: auto;
+            /* Muestra scroll si es necesario */
+            min-width: 100px;
+            /* Evita que se haga muy pequeño */
+            min-height: 50px;
+            /* Altura mínima */
+            max-width: none;
+            /* Permite crecer más allá del ancho del contenedor */
+            max-height: none;
+            /* Permite crecer verticalmente sin límite */
+            display: block;
+            /* Asegura que no esté restringido por el layout inline */
+            width: 100%;
+            /* Opcional: ajusta al ancho de la celda inicialmente */
+        }
+
+        /* Asegurar que el contenedor no limite el crecimiento horizontal */
+        .flex-grow-1 {
+            overflow-x: visible;
+        }
+
+        /* Asegurar que la tabla no limite el ancho de las celdas */
+        table {
+            table-layout: auto;
+            width: 100%;
+        }
+    </style>
     <script src="js/color-modes.js"></script>
     <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="node_modules/sweetalert2/dist/sweetalert2.min.css">
@@ -227,133 +259,140 @@ if ($query->num_rows > 0) {
 </head>
 
 <body>
-    <div class="d-flex">
+    <div class="d-flex h-100">
         <?php include 'sidebar.php'; ?>
 
         <!-- ========== MAIN CONTENT ========== -->
-        <main class="main-content">
-            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                <h3 class="h3">SOLICITUD DE ORDEN PRIVADOS</h3>
-                <div class="btn-toolbar mb-2 mb-md-0">
+        <main class="main-content d-flex flex-column vh-100">
+
+            <div class="encabezado-fijo bg-white border-bottom px-4 pt-3 pb-2" style="position: sticky; top: 0; z-index: 10;">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h3 class="h3">SOLICITUD DE ORDEN PRIVADOS</h3>
+                    <div class="btn-toolbar mb-2 mb-md-0">
 
 
-                    <form method="post" action="pdfVIP.php" target="_blank">
+                        <form method="post" action="pdfVIP.php" target="_blank">
 
-                        <div class="btn-group me-2">
-                            <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#fileAddPaciente">
-                                <i class="bi bi-filetype-exe"></i> Importar Paciente
-                            </button>
-                            </button>
-                        </div>
+                            <div class="btn-group me-2">
+                                <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#fileAddPaciente">
+                                    <i class="bi bi-filetype-exe"></i> Importar Paciente
+                                </button>
+                                </button>
+                            </div>
 
-                        <div class="btn-group me-2">
-                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="openModal();">
-                                <i class="bi bi-person-plus"></i> Agregar Paciente
-                            </button>
-                        </div>
+                            <div class="btn-group me-2">
+                                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="openModal();">
+                                    <i class="bi bi-person-plus"></i> Agregar Paciente
+                                </button>
+                            </div>
 
-                        <div class="btn-group me-2">
-                            <button type="submit" class="btn btn-sm btn-outline-secondary"><i class="bi bi-filetype-pdf"></i> Exportar</button>
-                        </div>
-                    </form>
+                            <div class="btn-group me-2">
+                                <button type="submit" class="btn btn-sm btn-outline-secondary"><i class="bi bi-filetype-pdf"></i> Exportar</button>
+                            </div>
+                        </form>
 
 
-                    <form action="">
-                        <div class="btn-group me-2">
-                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="location.href = 'formVIP.php';">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-clockwise" viewBox="0 0 16 16">
-                                    <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2z" />
-                                    <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466" />
-                                </svg>
-                            </button>
-                        </div>
-                    </form>
+                        <form action="">
+                            <div class="btn-group me-2">
+                                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="location.href = 'formVIP.php';">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-clockwise" viewBox="0 0 16 16">
+                                        <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2z" />
+                                        <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
 
-            <div class="row g-12">
-                <div class="mx-auto col-md-12 col-lg-12 ">
-                    <h1 class="mb-3"></h1>
-                    <div class="row g-3">
-                        <div class="table-responsive" style="max-height: 830px; overflow-y: auto;">
-                            <table id="miTabla" class="table table-light table-sm table-striped table-bordered">
-                                <thead>
-                                    <tr style="border: none;">
-                                        <th class="text-center table-light" style="border: none; background-color: white;" scope="col"></th>
-                                        <th class="text-center table-light" style="border: none; background-color: white;" scope="col"></th>
-                                        <th class="text-center table-light" style="border: none; background-color: white;" scope="col"></th>
-                                        <th class="text-center table-light" style="border: none; background-color: white;" scope="col"></th>
-                                        <th class="text-center table-light" style="border: none; background-color: white;" scope="col"></th>
-                                        <th class="text-center table-light" style="border: none; background-color: white;" scope="col"></th>
-                                        <th class="text-center table-light" style="border: none; background-color: white;" scope="col"></th>
-                                        <th class="text-center table-light" style="border: none; background-color: white;" scope="col"></th>
-                                        <th class="text-center table-light" style="border: none; background-color: white;" scope="col"></th>
-                                        <th class="text-center table-light" style="border: none; background-color: white;" scope="col"></th>
-                                        <th class="text-center" scope="col">Rango de Hora (7:00 - 8:00)</th>
-                                        <th class="text-center" scope="col">Rango de Hora (9:30 - 10:30)</th>
-                                        <th class="text-center" scope="col">Rango de Hora (11:30 - 12:30)</th>
-                                        <th class="text-center" scope="col">Rango de Hora (15:00 - 16:00)</th>
-                                        <th class="text-center" scope="col">Rango de Hora (16:30 - 17:30)</th>
-                                        <th class="text-center" scope="col">Rango de Hora (20:00 - 21:00)</th>
-                                        <th class="text-center table-light" style="border: none; background-color: white;" scope="col"></th>
-                                        <th class="text-center table-light" style="border: none; background-color: white;" scope="col"></th>
-                                        <th class="text-center table-light" style="border: none; background-color: white;" scope="col"></th>
-                                        <th class="text-center" scope="col" hidden></th>
-                                        <th class="text-center" scope="col" hidden></th>
-                                    </tr>
-                                    <tr>
-                                        <th class="text-center" scope="col"></th>
-                                        <th class="text-center" scope="col">Nombre del Paciente</th>
-                                        <th class="text-center" scope="col">Fecha de Nacimiento</th>
-                                        <th class="text-center" scope="col">ID</th>
-                                        <th class="text-center" scope="col">Cama</th>
-                                        <th class="text-center" scope="col">Edad Años</th>
-                                        <th class="text-center" scope="col">Edad Meses</th>
-                                        <th class="text-center" scope="col">Edad Dias</th>
-                                        <th class="text-center" scope="col">Diagnostico Médico y Nutricional</th>
-                                        <th class="text-center" scope="col">Prescripción Nutricional</th>
-                                        <th class="text-center" scope="col">Desayuno</th>
-                                        <th class="text-center" scope="col">Colación Matutina</th>
-                                        <th class="text-center" scope="col">Comida</th>
-                                        <th class="text-center" scope="col">Colación Vespertina</th>
-                                        <th class="text-center" scope="col">Cena</th>
-                                        <th class="text-center" scope="col">Colación Nocturna</th>
-                                        <th class="text-center" scope="col">Observaciones</th>
-                                        <th class="text-center" scope="col">Control de Tamizaje</th>
-                                        <th class="text-center" scope="col">Aislados</th>
-                                        <th class="text-center" scope="col" hidden>Usuario</th>
-                                        <th class="text-center" scope="col" hidden>Fecha_Hora_Solicitud</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php foreach ($datosCombinados as $dataRow) { ?>
-                                        <tr>
-                                            <td scope="col"><input type="checkbox" onclick="toggleEdit(this)"></td>
-                                            <td class="text-center" data-campo="nombre"><?php echo $dataRow["nombre"]; ?></td>
-                                            <td class="text-center" data-campo="fechaNacimiento"><?php echo $dataRow["fechaNacimiento"]; ?></td>
-                                            <td class="text-center" data-campo="idPaciente"><?php echo $dataRow["pacienteID"]; ?></td>
-                                            <td class="text-center" data-campo="cama"><?php echo $dataRow["cama"]; ?></td>
-                                            <td class="text-center" data-campo="edad"><?php echo $dataRow["edad"]; ?></td>
-                                            <td class="text-center" data-campo="edad"><?php echo $dataRow["edadMeses"]; ?></td>
-                                            <td class="text-center" data-campo="edad"><?php echo $dataRow["edadDias"]; ?></td>
-                                            <td class="text-center" data-campo="diagnosticoMed"><?php echo $dataRow["diagnosticoMed"]; ?></td>
-                                            <td class="text-center" data-campo="prescripcionNutri"><?php echo $dataRow["prescripcionNutri"]; ?></td>
-                                            <td class="text-center" data-campo="Desayuno"><textarea class="form-control-plaintext table-textarea" data-campo="Desayuno" disabled><?php echo $dataRow["Desayuno"]; ?></textarea></td>
-                                            <td class="text-center" data-campo="Col_Matutina"><textarea class="form-control-plaintext table-textarea" data-campo="Col_Matutina" disabled><?php echo $dataRow["Col_Matutina"]; ?></textarea></td>
-                                            <td class="text-center" data-campo="Comida"><textarea class="form-control-plaintext table-textarea" data-campo="Comida" disabled><?php echo $dataRow["Comida"]; ?></textarea></td>
-                                            <td class="text-center" data-campo="Col_Vespertina"><textarea class="form-control-plaintext table-textarea" data-campo="Col_Vespertina" disabled><?php echo $dataRow["Col_Vespertina"]; ?></textarea></td>
-                                            <td class="text-center" data-campo="Cena"><textarea class="form-control-plaintext table-textarea" data-campo="Cena" disabled><?php echo $dataRow["Cena"]; ?></textarea></td>
-                                            <td class="text-center" data-campo="Col_Nocturna"><textarea class="form-control-plaintext table-textarea" data-campo="Col_Nocturna" disabled><?php echo $dataRow["Col_Nocturna"]; ?></textarea></td>
-                                            <td class="text-center" data-campo="observaciones"><textarea class="form-control-plaintext table-textarea" data-campo="observaciones" disabled><?php echo $dataRow["observaciones"]; ?></textarea></td>
-                                            <td class="text-center" data-campo="controlTamizaje"><textarea class="form-control-plaintext table-textarea" data-campo="controlTamizaje" disabled><?php echo $dataRow["controlTamizaje"]; ?></textarea></td>
-                                            <td class="text-center" data-campo="vip"><?php echo $dataRow["vip"]; ?></td>
-                                            <td class="text-center" data-campo="usuario" hidden> <?php echo $sesionNombre; ?></td>
-                                            <td class="text-center" data-campo="fechaHoraActual" hidden><input type="datetime" id="fechaHoraActual" name="fechaHoraActual" readonly required></td>
-                                        </tr>
-                                    <?php } ?>
-                                </tbody>
-                            </table>
 
+
+            <div class="flex-grow-1 overflow-auto px-4 pb-4">
+                <div class="row g-12">
+                    <div class="mx-auto col-md-12 col-lg-12 ">
+                        <h1 class="mb-3"></h1>
+                        <div class="row g-3">
+                            <div class="table-responsive" style="max-height: 830px; overflow-y: auto;">
+                                <table id="miTabla" class="table table-light table-sm table-striped table-bordered">
+                                    <thead>
+                                        <tr style="border: none;">
+                                            <th class="text-center table-light" style="border: none; background-color: white;" scope="col"></th>
+                                            <th class="text-center table-light" style="border: none; background-color: white;" scope="col"></th>
+                                            <th class="text-center table-light" style="border: none; background-color: white;" scope="col"></th>
+                                            <th class="text-center table-light" style="border: none; background-color: white;" scope="col"></th>
+                                            <th class="text-center table-light" style="border: none; background-color: white;" scope="col"></th>
+                                            <th class="text-center table-light" style="border: none; background-color: white;" scope="col"></th>
+                                            <th class="text-center table-light" style="border: none; background-color: white;" scope="col"></th>
+                                            <th class="text-center table-light" style="border: none; background-color: white;" scope="col"></th>
+                                            <th class="text-center table-light" style="border: none; background-color: white;" scope="col"></th>
+                                            <th class="text-center table-light" style="border: none; background-color: white;" scope="col"></th>
+                                            <th class="text-center" scope="col">Rango de Hora (7:00 - 8:00)</th>
+                                            <th class="text-center" scope="col">Rango de Hora (9:30 - 10:30)</th>
+                                            <th class="text-center" scope="col">Rango de Hora (11:30 - 12:30)</th>
+                                            <th class="text-center" scope="col">Rango de Hora (15:00 - 16:00)</th>
+                                            <th class="text-center" scope="col">Rango de Hora (16:30 - 17:30)</th>
+                                            <th class="text-center" scope="col">Rango de Hora (20:00 - 21:00)</th>
+                                            <th class="text-center table-light" style="border: none; background-color: white;" scope="col"></th>
+                                            <th class="text-center table-light" style="border: none; background-color: white;" scope="col"></th>
+                                            <th class="text-center table-light" style="border: none; background-color: white;" scope="col"></th>
+                                            <th class="text-center" scope="col" hidden></th>
+                                            <th class="text-center" scope="col" hidden></th>
+                                        </tr>
+                                        <tr>
+                                            <th class="text-center" scope="col"></th>
+                                            <th class="text-center" scope="col">Nombre del Paciente</th>
+                                            <th class="text-center" scope="col">Fecha de Nacimiento</th>
+                                            <th class="text-center" scope="col">ID</th>
+                                            <th class="text-center" scope="col">Cama</th>
+                                            <th class="text-center" scope="col">Edad Años</th>
+                                            <th class="text-center" scope="col">Edad Meses</th>
+                                            <th class="text-center" scope="col">Edad Dias</th>
+                                            <th class="text-center" scope="col">Diagnostico Médico y Nutricional</th>
+                                            <th class="text-center" scope="col">Prescripción Nutricional</th>
+                                            <th class="text-center" scope="col">Desayuno</th>
+                                            <th class="text-center" scope="col">Colación Matutina</th>
+                                            <th class="text-center" scope="col">Comida</th>
+                                            <th class="text-center" scope="col">Colación Vespertina</th>
+                                            <th class="text-center" scope="col">Cena</th>
+                                            <th class="text-center" scope="col">Colación Nocturna</th>
+                                            <th class="text-center" scope="col">Observaciones</th>
+                                            <th class="text-center" scope="col">Control de Tamizaje</th>
+                                            <th class="text-center" scope="col">Aislados</th>
+                                            <th class="text-center" scope="col" hidden>Usuario</th>
+                                            <th class="text-center" scope="col" hidden>Fecha_Hora_Solicitud</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php foreach ($datosCombinados as $dataRow) { ?>
+                                            <tr>
+                                                <td scope="col"><input type="checkbox" onclick="toggleEdit(this)"></td>
+                                                <td class="text-center" data-campo="nombre"><?php echo $dataRow["nombre"]; ?></td>
+                                                <td class="text-center" data-campo="fechaNacimiento"><?php echo $dataRow["fechaNacimiento"]; ?></td>
+                                                <td class="text-center" data-campo="idPaciente"><?php echo $dataRow["pacienteID"]; ?></td>
+                                                <td class="text-center" data-campo="cama"><?php echo $dataRow["cama"]; ?></td>
+                                                <td class="text-center" data-campo="edad"><?php echo $dataRow["edad"]; ?></td>
+                                                <td class="text-center" data-campo="edad"><?php echo $dataRow["edadMeses"]; ?></td>
+                                                <td class="text-center" data-campo="edad"><?php echo $dataRow["edadDias"]; ?></td>
+                                                <td class="text-center" data-campo="diagnosticoMed"><?php echo $dataRow["diagnosticoMed"]; ?></td>
+                                                <td class="text-center" data-campo="prescripcionNutri"><?php echo $dataRow["prescripcionNutri"]; ?></td>
+                                                <td class="text-center" data-campo="Desayuno"><textarea class="form-control-plaintext table-textarea" data-campo="Desayuno" disabled><?php echo $dataRow["Desayuno"]; ?></textarea></td>
+                                                <td class="text-center" data-campo="Col_Matutina"><textarea class="form-control-plaintext table-textarea" data-campo="Col_Matutina" disabled><?php echo $dataRow["Col_Matutina"]; ?></textarea></td>
+                                                <td class="text-center" data-campo="Comida"><textarea class="form-control-plaintext table-textarea" data-campo="Comida" disabled><?php echo $dataRow["Comida"]; ?></textarea></td>
+                                                <td class="text-center" data-campo="Col_Vespertina"><textarea class="form-control-plaintext table-textarea" data-campo="Col_Vespertina" disabled><?php echo $dataRow["Col_Vespertina"]; ?></textarea></td>
+                                                <td class="text-center" data-campo="Cena"><textarea class="form-control-plaintext table-textarea" data-campo="Cena" disabled><?php echo $dataRow["Cena"]; ?></textarea></td>
+                                                <td class="text-center" data-campo="Col_Nocturna"><textarea class="form-control-plaintext table-textarea" data-campo="Col_Nocturna" disabled><?php echo $dataRow["Col_Nocturna"]; ?></textarea></td>
+                                                <td class="text-center" data-campo="observaciones"><textarea class="form-control-plaintext table-textarea" data-campo="observaciones" disabled><?php echo $dataRow["observaciones"]; ?></textarea></td>
+                                                <td class="text-center" data-campo="controlTamizaje"><textarea class="form-control-plaintext table-textarea" data-campo="controlTamizaje" disabled><?php echo $dataRow["controlTamizaje"]; ?></textarea></td>
+                                                <td class="text-center" data-campo="vip"><?php echo $dataRow["vip"]; ?></td>
+                                                <td class="text-center" data-campo="usuario" hidden> <?php echo $sesionNombre; ?></td>
+                                                <td class="text-center" data-campo="fechaHoraActual" hidden><input type="datetime" id="fechaHoraActual" name="fechaHoraActual" readonly required></td>
+                                            </tr>
+                                        <?php } ?>
+                                    </tbody>
+                                </table>
+
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -387,7 +426,7 @@ if ($query->num_rows > 0) {
                                     <input type="number" class="form-control fs-5" id="idPaciente" name="idPaciente" required>
                                 </div>
 
-                               <div class="form-group col-md-9">
+                                <div class="form-group col-md-9">
                                     <label class="fs-5">Cama</label>
                                     <select name="cama" id="cama" class="form-control fs-5" required>
                                         <?php
@@ -448,7 +487,7 @@ if ($query->num_rows > 0) {
 
                                 <div class="form-group col-md-9" hidden>
                                     <label class="fs-4">status</label>
-                                    <input type="text" class="form-control fs-4" id="statusP" value="Alta" required>
+                                    <input type="text" class="form-control fs-4" id="statusP" value="Activo" required>
                                 </div>
 
 

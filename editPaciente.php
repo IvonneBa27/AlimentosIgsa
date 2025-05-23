@@ -20,8 +20,9 @@ $query = mysqli_query($con, $sql);
 
 
 $vipOptions = ["APLICA", "N/A"];
-$statusOptions = ["Alta", "Baja"];
-$areaOptions = ["CIRUGÍA GENERAL", "MEDICINA INTERNA", "GINECOLOGÍA", "PEDIATRÍA", "PRIVADOS", "QUEMADOS", "UTIP", "UCIA"]
+$statusOptions = ["Activo", "Inactivo"];
+$areaOptions = ["CIRUGÍA GENERAL", "MEDICINA INTERNA", "GINECOLOGÍA", "PEDIATRÍA", "PRIVADOS", "QUEMADOS", "UTIP", "UCIA"];
+
 ?>
 
 <!DOCTYPE html>
@@ -98,10 +99,13 @@ $areaOptions = ["CIRUGÍA GENERAL", "MEDICINA INTERNA", "GINECOLOGÍA", "PEDIATR
                                 <table id="miTabla" class="table table-secondary table-sm table-striped table-bordered">
                                     <thead>
                                         <tr>
+                                            <th class="text-center" scope="col" hidden>ID Paciente</th>
                                             <th class="text-center" scope="col">Nombre del Paciente</th>
                                             <th class="text-center" scope="col">Fecha de Nacimiento</th>
                                             <th class="text-center" scope="col">ID</th>
+                                            <th class="text-center" scope="col" hidden>ID2</th>
                                             <th class="text-center" scope="col">Cama</th>
+                                            <th class="text-center" scope="col" hidden>Cama2</th>
                                             <th class="text-center" scope="col">Edad</th>
                                             <th class="text-center" scope="col">Diagnostico Médico y Nutricional</th>
                                             <th class="text-center" scope="col">Prescripción Nutricional</th>
@@ -113,16 +117,24 @@ $areaOptions = ["CIRUGÍA GENERAL", "MEDICINA INTERNA", "GINECOLOGÍA", "PEDIATR
                                             <th class="text-center" scope="col">Creado por</th>
                                             <th class="text-center" scope="col">Acciones</th>
                                             <th class="text-center" scope="col" hidden>Usuario</th>
-                                        </tr>
+                                        </tr>|
                                     </thead>
                                     <tbody>
                                         <?php while ($dataRow = mysqli_fetch_array($query)) { ?>
                                             <tr>
-                                                <input type="hidden" id="id" name="id" maxlength="10" class="form-control" value="<?php echo $dataRow["id"]; ?>">
+                                                <td class="text-center" data-campo="id" hidden><input type="" id="id" name="id" maxlength="10" class="form-control" value="<?php echo $dataRow["id"]; ?>"></td>
                                                 <td class="text-center" data-campo="nombre"><input name="nombre" class="form-control-plaintext" type="text" value="<?php echo $dataRow["nombre"]; ?>"></td>
                                                 <td class="text-center" data-campo="fechaNacimiento"><input name="fechaNacimiento" class="form-control-plaintext" type="text" value="<?php echo $dataRow["fechaNacimiento"]; ?>"></td>
                                                 <td class="text-center" data-campo="idPaciente"><input name="idPaciente" class="form-control-plaintext" type="text" value="<?php echo $dataRow["idPaciente"]; ?>"></td>
-                                                <td class="text-center" data-campo="cama"><input name="cama" class="form-control-plaintext" type="text" value="<?php echo $dataRow["cama"]; ?>"></td>
+                                                <td class="text-center" data-campo="idPaciente2" hidden><input name="idPaciente2" class="form-control-plaintext" type="text" value="<?php echo $dataRow["idPaciente"]; ?>"></td>
+
+                                                <td class="text-center" data-campo="cama">
+                                                    <select name="cama" id="camaSelect" class="form-control-plaintext">
+                                                        <option value="<?php echo $dataRow["cama"]; ?>"><?php echo $dataRow["cama"]; ?></option>
+                                                    </select>
+                                                </td>
+
+                                                <td class="text-center" data-campo="cama2" hidden><input name="cama2" class="form-control-plaintext" type="text" value="<?php echo $dataRow["cama"]; ?>"></td>
                                                 <td class="text-center" data-campo="edad"><input name="edad" class="form-control-plaintext" type="text" value="<?php echo $dataRow["edad"]; ?>" disabled></td>
                                                 <td class="text-center" data-campo="diagnosticoMed"><textarea class="form-control-plaintext table-textarea text-center" name="diagnosticoMed" id=""><?php echo $dataRow["diagnosticoMed"]; ?></textarea></td>
                                                 <td class="text-center" data-campo="prescripcionNutri"><textarea class="form-control-plaintext table-textarea text-center" name="prescripcionNutri" id=""><?php echo $dataRow["prescripcionNutri"]; ?></textarea></td>
@@ -145,18 +157,18 @@ $areaOptions = ["CIRUGÍA GENERAL", "MEDICINA INTERNA", "GINECOLOGÍA", "PEDIATR
 
                                                 <td class="text-center" data-campo="usuario" hidden> <?php echo $sesionNombre; ?></td>
 
+
                                                 <td class="text-center" data-campo="area">
                                                     <?php $currentArea = $dataRow["area"]; ?>
-                                                    <select class="form-control-plaintext" name="area" id="">
-                                                        <option value="<?php echo $currentArea; ?>"><?php echo $currentArea; ?></option>
+                                                    <select class="form-control-plaintext" name="area" id="areaSelect">
+                                                        <option value="">Seleccione un área</option>
                                                         <?php foreach ($areaOptions as $option): ?>
-                                                            <?php if ($option != $currentArea): ?>
-                                                                <option value="<?php echo $option; ?>"><?php echo $option; ?></option>
-                                                            <?php endif; ?>
+                                                            <option value="<?php echo $option; ?>" <?php echo ($option == $currentArea) ? 'selected' : ''; ?>>
+                                                                <?php echo $option; ?>
+                                                            </option>
                                                         <?php endforeach; ?>
                                                     </select>
                                                 </td>
-
 
                                                 <td class="text-center" data-campo="statusP">
                                                     <?php $currentStatus = $dataRow["statusP"]; ?>
@@ -172,7 +184,7 @@ $areaOptions = ["CIRUGÍA GENERAL", "MEDICINA INTERNA", "GINECOLOGÍA", "PEDIATR
 
                                                 <td class="text-center" data-campo="creadoPor"><?php echo $dataRow["creadoPor"] ?></td>
 
-                                                <td class="text-center"> <button type="submit" class="btn btn-primary" name="editar"><a style="text-decoration: none; color: white;">Actualizar</a></button>
+                                                <td class="text-center"> <button type="submit" class="btn btn-primary" name="editar"><a style="text-decoration: none; color: white;" id="">Actualizar</a></button>
                                                     <button class="btn btn-danger"><a href="pacientes.php" style="text-decoration: none; color: white;">Cancelar</a></button>
                                                 </td>
                                                 <td class="text-center" data-campo="fechaHoraActual" hidden><input type="datetime" id="fechaHoraActual" name="fechaHoraActual" readonly required></td>
@@ -274,7 +286,7 @@ $areaOptions = ["CIRUGÍA GENERAL", "MEDICINA INTERNA", "GINECOLOGÍA", "PEDIATR
 
                                 <div class="form-group col-md-9" hidden>
                                     <label class="fs-4">status</label>
-                                    <input type="text" class="form-control fs-4" id="statusP" value="Alta" required>
+                                    <input type="text" class="form-control fs-4" id="statusP" value="Activo" required>
                                 </div>
 
 
@@ -321,11 +333,11 @@ $areaOptions = ["CIRUGÍA GENERAL", "MEDICINA INTERNA", "GINECOLOGÍA", "PEDIATR
     <script src="node_modules/chart.js/dist/chart.umd.js"></script>
     <script type="text/javascript" src="node_modules/jquery/dist/jquery.min.js"></script>
     <script src="js/sidebars.js"></script>
-    <script src="js/editpacientes.js"></script>
-    <script src="js/seguridad.js"></script>
+
 
     <?php include 'footer.php'; ?>
 </body>
 
-
 </html>
+<script src="js/editpacientes.js"></script>
+<script src="js/seguridad.js"></script>

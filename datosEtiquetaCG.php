@@ -167,7 +167,7 @@ if ($tipo == 'Desayuno' && $paciente == 'Todos') {
 
 $exiteImpresora = new ExisteImpresoraWindows();
 $epl = new ImprimirEpl();
-$nombre_impresora = "TSC DA210"; 
+$nombre_impresora = "TSC_DA210"; 
 
 if ($exiteImpresora->verificarImpresora($nombre_impresora, true)) {
     // Imprimir etiquetas

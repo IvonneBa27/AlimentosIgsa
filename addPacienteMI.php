@@ -29,7 +29,7 @@ if ($query1->num_rows > 0) {
     $response['status'] = 'error';
     $response['message'] = 'El ID ingresado para paciente ya existe, valide los datos';
 } else {
-    $camaQuery = "SELECT * FROM pacientes WHERE cama = '$cama' AND area = 'MEDICINA INTERNA'";
+    $camaQuery = "SELECT * FROM pacientes WHERE cama = '$cama' AND area = 'MEDICINA INTERNA' AND statusP = 'Activo'";
     $query2 = mysqli_query($con, $camaQuery);
 
     if ($query2->num_rows > 0) {

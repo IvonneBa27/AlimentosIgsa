@@ -176,7 +176,11 @@ function submitForm() {
                     //window.location.replace("http://10.1.7.169/dietas/formMI.php");
                 } else if (text.includes('El ID ingresado para paciente ya existe')) {
                     alert(text);
-                } else {
+                } else if (text.includes('Las siguientes camas no existen en el área de MEDICINA INTERNA')) {
+                    alert(text);
+                } else if (text.includes('La cama ingresada ya existe en el área de MEDICINA INTERNA')) {
+                    alert(text);
+                }else {
                     alert('Error al subir el archivo.');
                 }
             }).catch(error => {
