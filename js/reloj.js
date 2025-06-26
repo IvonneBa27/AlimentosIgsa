@@ -24,9 +24,9 @@ window.onload = obtenerFechaHoraDelServidor;
 function verificarRangoHora(fechaHora) {
     var rangos = [
         { inicio: '07:00', fin: '08:30', campo: 'Desayuno' },
-        { inicio: '09:30', fin: '10:30', campo: 'Col_Matutina' },
+        { inicio: '09:30', fin: '11:30', campo: 'Col_Matutina' },
         { inicio: '11:00', fin: '12:30', campo: 'Comida' },
-        { inicio: '15:00', fin: '16:00', campo: 'Col_Vespertina' },
+        { inicio: '1:30', fin: '15:30', campo: 'Col_Vespertina' },
         { inicio: '16:30', fin: '17:30', campo: 'Cena' },
         { inicio: '20:00', fin: '21:00', campo: 'Col_Nocturna' }
     ];

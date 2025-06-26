@@ -65,7 +65,7 @@ $productos = $stmtProducto->fetchAll(PDO::FETCH_ASSOC);
 
                     <form action="">
                         <div class="btn-group me-2">
-                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="location.href = 'reporteGeneral.php';">
+                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="location.href = 'reporteGeneralCortesias.php';">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-clockwise" viewBox="0 0 16 16">
                                     <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2z" />
                                     <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466" />
@@ -91,7 +91,7 @@ $productos = $stmtProducto->fetchAll(PDO::FETCH_ASSOC);
                     </div>
                     <div class="col-md-6"></div>
                     <div class="col-md-12 d-flex align-items-end mb-12">
-             
+
                     </div>
 
                     <div class="col-md-3 d-flex align-items-end mb-3">
@@ -121,7 +121,7 @@ $productos = $stmtProducto->fetchAll(PDO::FETCH_ASSOC);
                             <th>Departamento</th>
                             <th>Tipo Producto</th>
                             <th>Solicitante</th>
-                            <th>Importe</th>
+                            <th>Estatus</th>
                             <th>Fecha de Registro</th>
                         </tr>
                     </thead>
@@ -202,24 +202,41 @@ $productos = $stmtProducto->fetchAll(PDO::FETCH_ASSOC);
             });
 
             $('#btn-exportar').on('click', function() {
-                window.location.href = 'exportar_excel.php?' + $('#filtro-form').serialize();
+                window.location.href = 'exportar_excel_cortesias.php?' + $('#filtro-form').serialize();
             });
 
             $('#btn-enviar-correo').on('click', function() {
                 const correos = $('#correos').val();
                 if (!correos) {
-                    alert('Por favor, ingresa al menos un correo.');
-                    return;
+                    return Swal.fire({
+                        icon: 'warning',
+                        title: 'Faltan correos',
+                        text: 'Por favor, ingresa al menos un correo.',
+                        confirmButtonColor: '#ffc107'
+                    });
                 }
                 const filtros = $('#filtro-form').serialize();
-                $.post('enviar_correo.php', {
+                $.post('enviar_correo_cortesias.php', {
                     correos,
                     filtros
                 }, function(response) {
-                    alert(response.mensaje || 'Correo enviado exitosamente.');
-                    $('#modalEnviarCorreo').modal('hide');
-                }).fail(function() {
-                    alert('Error al enviar correo.');
+                    Swal.fire({
+                        icon: response.mensaje && response.mensaje.toLowerCase().includes('error') ? 'error' : 'success',
+                        title: response.mensaje.includes('Error') ? 'Error' : '¡Éxito!',
+                        text: response.mensaje,
+                        confirmButtonColor: response.mensaje.includes('Error') ? '#d33' : '#28a745'
+                    }).then(() => {
+                        $('#modalEnviarCorreo').modal('hide');
+                        $('.modal-backdrop').remove(); // ✅ Eliminar la capa negra
+                        $('body').removeClass('modal-open'); // ✅ Evitar scroll bloqueado
+                    });
+                }, 'json').fail(function() {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error de servidor',
+                        text: 'Error al enviar correo.',
+                        confirmButtonColor: '#d33'
+                    });
                 });
             });
         });

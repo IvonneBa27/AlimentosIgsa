@@ -27,7 +27,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         // Definir tipo de producto según la hora
         $time = (int)date('H') * 60 + (int)date('i');
-        if ($time >= 480 && $time < 660) {
+        if ($time >= 480 && $time < 780) { //666
             $tipo_producto = 1; // Desayuno
         } elseif ($time >= 780 && $time < 1760) {
             $tipo_producto = 2; // Comida

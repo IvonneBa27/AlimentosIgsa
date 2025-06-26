@@ -22,12 +22,13 @@ $sql_base = "SELECT
             d.nombre AS departamento,
             p.producto as tipo_producto,
             cc.solicitante,
-            cc.cantidad,
+            cs.status as estatus,
             cc.fecha_registro
         FROM control_cortesias cc  
         LEFT JOIN producto p ON p.id = cc.tipo_producto
         LEFT JOIN empresa e ON cc.empresa_id = e.id
         LEFT JOIN departamento d ON cc.departamento_id = d.id
+        LEFT JOIN catalog_status cs ON cc.estatus_id = cs.status_id
         WHERE 1=1"; // <- para que puedas agregar más condiciones después
 
 if ($fecha_inicio && $fecha_fin) {
@@ -68,7 +69,7 @@ foreach ($registros as $registro) {
     $tabla .= "<td>{$registro['departamento']}</td>";
     $tabla .= "<td>{$registro['tipo_producto']}</td>";
     $tabla .= "<td>{$registro['solicitante']}</td>";
-    $tabla .= "<td>{$registro['cantidad']}</td>"; 
+    $tabla .= "<td>{$registro['estatus']}</td>"; 
     $tabla .= "<td>{$registro['fecha_registro']}</td>";
     $tabla .= '</tr>';
 }

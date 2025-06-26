@@ -83,7 +83,7 @@ foreach ($resultados as $data) {
 }
 
 // Establecer nombre del archivo
-$filename = 'Reporte_Consumo_Punto_Venta_' . date('Ymd_His') . '.xlsx';
+$filename = 'REGISTRO_VENTAS_' . date('Ymd_His') . '.xlsx';
 
 // Limpiar cualquier salida previa
 if (ob_get_contents()) {

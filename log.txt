@@ -4,3 +4,8 @@ Entrando a actualizar folio: ID=17, FOLIO=F-89754120
 Entrando a actualizar folio: ID=21, FOLIO=F-12434300
 Entrando a actualizar folio: ID=22, FOLIO=F-10114234
 Entrando a actualizar folio: ID=23, FOLIO=f-47897545
+Entrando a actualizar folio: ID=5, FOLIO=F-10114751
+Entrando a actualizar folio: ID=6, FOLIO=F-14534535
+Entrando a actualizar folio: ID=12, FOLIO=F-12434300
+Entrando a actualizar folio: ID=14, FOLIO=F-10114751
+Entrando a actualizar folio: ID=16, FOLIO=F-10114751

@@ -19,17 +19,17 @@ $sesionNombre = $sesi['nombre'];   // Reemplaza con el nombre exacto de la colum
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> O P E R A C I Ó N &nbsp; &nbsp; C O M E D O R </title>
-    <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
-    <script src="js/color-modes.js"></script>
-    <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" type="text/css" href="node_modules/sweetalert2/dist/sweetalert2.min.css">
-    <script src="node_modules/sweetalert2/dist/sweetalert2.min.js"></script>
-    <script src="js/color-modes.js"></script>
-    <link rel="stylesheet" href="node_modules/bootstrap-icons/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title> O P E R A C I Ó N &nbsp; &nbsp; C O M E D O R </title>
+  <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
+  <script src="js/color-modes.js"></script>
+  <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" type="text/css" href="node_modules/sweetalert2/dist/sweetalert2.min.css">
+  <script src="node_modules/sweetalert2/dist/sweetalert2.min.js"></script>
+  <script src="js/color-modes.js"></script>
+  <link rel="stylesheet" href="node_modules/bootstrap-icons/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
 
 
@@ -38,11 +38,11 @@ $sesionNombre = $sesi['nombre'];   // Reemplaza con el nombre exacto de la colum
 </head>
 
 <div>
-    <div class="d-flex">
-        <?php include 'sidebar.php'; ?>
+  <div class="d-flex">
+    <?php include 'sidebar.php'; ?>
 
-        <!-- ========== MAIN CONTENT ========== -->
-        <main class="main-content">
+    <!-- ========== MAIN CONTENT ========== -->
+    <main class="main-content">
       <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
         <h3 class="h3">CONTROL DE ALIMENTOS</h3>
         <div class="btn-toolbar mb-2 mb-md-0">
@@ -211,16 +211,17 @@ $sesionNombre = $sesi['nombre'];   // Reemplaza con el nombre exacto de la colum
 
 
 
-  </main>
+    </main>
   </div>
 
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
   <script src="node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-  <!--<script src="node_modules/chart.js/dist/chart.umd.js"></script>-->
+  <script src="node_modules/chart.js/dist/chart.umd.js"></script>
   <script src="js/sidebars.js"></script>
   <script src="js/seguridad.js"></script>
 
   <?php include 'footer.php'; ?>
 
-</body>
+  </body>
 
 </html>

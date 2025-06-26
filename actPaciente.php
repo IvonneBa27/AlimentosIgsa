@@ -34,8 +34,10 @@ if ($idPaciente == $idPaciente2 && $cama == $cama2) {
                controlTamizaje = '$control', statusP ='$acceso' WHERE id='$id'";
     $query0 = mysqli_query($con, $actualizar);
     if ($query0) {
-        $response['status'] = 'success';
-        $response['message'] = 'Paciente actualizado exitosamente.';
+       $response['status'] = 'success';
+            $response['message'] = 'Paciente actualizado exitosamente.';
+              $id = $_POST['id']; // Asegúrate de tener el ID del paciente actualizado
+            header("Location: editPaciente.php?id=$id");
     } else {
         $response['status'] = 'error';
         $response['message'] = 'Ocurrió un error al actualizar el paciente';
@@ -76,8 +78,11 @@ if ($idPaciente == $idPaciente2 && $cama == $cama2) {
             controlTamizaje = '$control', statusP ='$acceso' WHERE id='$id'";
             $query = mysqli_query($con, $actualizar);
             if ($query) {
-                $response['status'] = 'success';
-                $response['message'] = 'Paciente actualizado exitosamente.';
+            $response['status'] = 'success';
+            $response['message'] = 'Paciente actualizado exitosamente.';
+              $id = $_POST['id']; // Asegúrate de tener el ID del paciente actualizado
+            header("Location: editPaciente.php?id=$id");
+                
             } else {
                 $response['status'] = 'error';
                 $response['message'] = 'Ocurrió un error al actualizar el paciente';
@@ -113,6 +118,9 @@ if ($idPaciente == $idPaciente2 && $cama == $cama2) {
         if ($query) {
             $response['status'] = 'success';
             $response['message'] = 'Paciente actualizado exitosamente.';
+            $id = $_POST['id']; // Asegúrate de tener el ID del paciente actualizado
+            header("Location: editPaciente.php?id=$id");
+            exit;
         } else {
             $response['status'] = 'error';
             $response['message'] = 'Ocurrió un error al actualizar el paciente.';
@@ -146,6 +154,8 @@ if ($idPaciente == $idPaciente2 && $cama == $cama2) {
         if ($query) {
             $response['status'] = 'success';
             $response['message'] = 'Paciente actualizado exitosamente.';
+              $id = $_POST['id']; // Asegúrate de tener el ID del paciente actualizado
+            header("Location: editPaciente.php?id=$id");
         } else {
             $response['status'] = 'error';
             $response['message'] = 'Ocurrió un error al actualizar el paciente';

@@ -78,7 +78,7 @@ while ($data = $stmt->fetch(PDO::FETCH_ASSOC)) {
 
 // Guardar el archivo Excel en el servidor temporalmente
 $writer = new Xlsx($spreadsheet);
-$filename = 'Reporte_Consumo_Punto_Venta_' . date('Ymd_His') . '.xlsx';
+$filename = 'REGISTRO_VENTAS' . date('Ymd_His') . '.xlsx';
 $filepath = sys_get_temp_dir() . '/' . $filename;
 $writer->save($filepath);
 
@@ -104,8 +104,8 @@ try {
 
     // Contenido del correo
     $mail->isHTML(true);
-    $mail->Subject = 'Reporte Consumo Punto de Venta';
-    $mail->Body    = 'Reporte Consumo Punto de Venta';
+    $mail->Subject = 'REGISTRO DE VENTAS';
+    $mail->Body    = 'Reporte de registros de Ventas';
     $mail->AltBody = 'Adjunto reporte solicitado.';
 
     // Adjuntar el archivo Excel
