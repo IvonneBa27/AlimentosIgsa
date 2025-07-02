@@ -65,8 +65,11 @@ try {
     $mail->Body = "
         <p>Estimado(a)</p>
         <p>Tu código de barras ha sido generado y se adjunta a este mensaje.</p>
+         <p>Consulta nuestro <a href='https://igsa1-my.sharepoint.com/:b:/g/personal/apps-zumpango_igsamedical_com/EfmeKXrrAxFEoyMPPyIunVgBZ-2YdTVkg1WYTWzuxg22mA?e=ho0DsW' target='_blank'>Aviso de Privacidad</a>.</p>
+    <br>
         <p>Gracias por usar el sistema de control de alimentos.</p>";
-    $mail->addAttachment($barcodePath);
+    
+        $mail->addAttachment($barcodePath);
 
     $mail->send();
 

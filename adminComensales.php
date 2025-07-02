@@ -629,7 +629,7 @@ $departamentos = $stmtDepartamentos->fetchAll(PDO::FETCH_ASSOC);
                 </div>
                 <div class="modal-footer">
                     <form action="alta_comensal.php" method="POST">
-                        <input type="input" name="id" id="altaComensalId">
+                        <input type="hidden" name="id" id="altaComensalId">
                         <button type="submit" class="btn btn-success">Sí, dar de alta</button>
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                     </form>

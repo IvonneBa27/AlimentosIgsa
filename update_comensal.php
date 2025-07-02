@@ -148,6 +148,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         <p>Gracias por actualizar tu información en nuestro sistema. Por este medio, se ha generado y compartido tu código de barras personal.</p>
                         <p>Este código será necesario para ingresar al comedor y realizar tu checklist correspondiente.</p>
                         <p>Si tienes alguna duda, no dudes en contactarnos.</p>
+                         <p>Consulta nuestro <a href='https://igsa1-my.sharepoint.com/:b:/g/personal/apps-zumpango_igsamedical_com/EfmeKXrrAxFEoyMPPyIunVgBZ-2YdTVkg1WYTWzuxg22mA?e=ho0DsW' target='_blank'>Aviso de Privacidad</a>.</p>
+    <br>
                         <p>Atentamente,</p>
                         <p><strong>Sistema de Control de Alimentos</strong></p>";
 
