@@ -51,25 +51,3 @@ document.addEventListener('DOMContentLoaded', function() {
     setInterval(() => obtenerDatos(fechaFiltroInput.value), 5000); // Actualiza cada 5 segundos
 });
 
-
-
-
-/*
-    function obtenerDatos() {
-        fetch('datosDashboardP.php')
-            .then(response => response.json())
-            .then(data => {
-                const labels = data.map(item => item.nombre_dia);
-                const cantidades = data.map(item => item.cantidad);
-  
-                myChart.data.labels = labels;
-                myChart.data.datasets[0].data = cantidades;
-                myChart.update();
-            })
-            .catch(error => console.error('Error al obtener los datos:', error));
-    }
-  
-    obtenerDatos();
-    setInterval(obtenerDatos, 5000); // Actualiza cada 5 segundos
-  });
-  */

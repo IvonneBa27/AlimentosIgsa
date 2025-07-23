@@ -7,7 +7,8 @@ include 'conexion.php';
 $tipo = $_POST['selectTipo'];
 $paciente = $_POST['selectPacientes'];
 
-function generarEtiquetaDesayuno($dato){
+function generarEtiquetaDesayuno($dato)
+{
     return [
         "PACIENTE: " . $dato['Nombre_Paciente'],
         "FECHA DE NACIMIENTO: " . $dato['Fecha_Nacimiento_Paciente'],
@@ -19,7 +20,8 @@ function generarEtiquetaDesayuno($dato){
     ];
 }
 
-function generarEtiquetaColMatutina($dato){
+function generarEtiquetaColMatutina($dato)
+{
     return [
         "PACIENTE: " . $dato['Nombre_Paciente'],
         "FECHA DE NACIMIENTO: " . $dato['Fecha_Nacimiento_Paciente'],
@@ -31,7 +33,8 @@ function generarEtiquetaColMatutina($dato){
     ];
 }
 
-function generarEtiquetaComida($dato){
+function generarEtiquetaComida($dato)
+{
     return [
         "PACIENTE: " . $dato['Nombre_Paciente'],
         "FECHA DE NACIMIENTO: " . $dato['Fecha_Nacimiento_Paciente'],
@@ -43,7 +46,8 @@ function generarEtiquetaComida($dato){
     ];
 }
 
-function generarEtiquetaColVespertina($dato){
+function generarEtiquetaColVespertina($dato)
+{
     return [
         "PACIENTE: " . $dato['Nombre_Paciente'],
         "FECHA DE NACIMIENTO: " . $dato['Fecha_Nacimiento_Paciente'],
@@ -55,7 +59,8 @@ function generarEtiquetaColVespertina($dato){
     ];
 }
 
-function generarEtiquetaCena($dato){
+function generarEtiquetaCena($dato)
+{
     return [
         "PACIENTE: " . $dato['Nombre_Paciente'],
         "FECHA DE NACIMIENTO: " . $dato['Fecha_Nacimiento_Paciente'],
@@ -67,7 +72,8 @@ function generarEtiquetaCena($dato){
     ];
 }
 
-function generarEtiquetaColNocturna($dato){
+function generarEtiquetaColNocturna($dato)
+{
     return [
         "PACIENTE: " . $dato['Nombre_Paciente'],
         "FECHA DE NACIMIENTO: " . $dato['Fecha_Nacimiento_Paciente'],
@@ -85,92 +91,80 @@ if ($tipo == 'Desayuno' && $paciente == 'Todos') {
     $result = mysqli_query($con, $query);
     $datos = mysqli_fetch_all($result, MYSQLI_ASSOC);
     $generarEtiqueta = 'generarEtiquetaDesayuno';
-
 } elseif ($tipo == 'Col_Matutina' && $paciente == 'Todos') {
 
     $query = "SELECT * FROM dietas WHERE area = 'CIRUGÍA GENERAL' AND DATE(Fecha_Hora_Creacion) = CURDATE()";
     $result = mysqli_query($con, $query);
     $datos = mysqli_fetch_all($result, MYSQLI_ASSOC);
     $generarEtiqueta = 'generarEtiquetaColMatutina';
-
-}elseif ($tipo == 'Comida' && $paciente == 'Todos') {
+} elseif ($tipo == 'Comida' && $paciente == 'Todos') {
 
     $query = "SELECT * FROM dietas WHERE area = 'CIRUGÍA GENERAL' AND DATE(Fecha_Hora_Creacion) = CURDATE()";
     $result = mysqli_query($con, $query);
     $datos = mysqli_fetch_all($result, MYSQLI_ASSOC);
     $generarEtiqueta = 'generarEtiquetaComida';
-
 } elseif ($tipo == 'Col_Vespertina' && $paciente == 'Todos') {
 
     $query = "SELECT * FROM dietas WHERE area = 'CIRUGÍA GENERAL' AND DATE(Fecha_Hora_Creacion) = CURDATE()";
     $result = mysqli_query($con, $query);
     $datos = mysqli_fetch_all($result, MYSQLI_ASSOC);
     $generarEtiqueta = 'generarEtiquetaColVespertina';
-
-}elseif ($tipo == 'Cena' && $paciente == 'Todos') {
+} elseif ($tipo == 'Cena' && $paciente == 'Todos') {
 
     $query = "SELECT * FROM dietas WHERE area = 'CIRUGÍA GENERAL' AND DATE(Fecha_Hora_Creacion) = CURDATE()";
     $result = mysqli_query($con, $query);
     $datos = mysqli_fetch_all($result, MYSQLI_ASSOC);
     $generarEtiqueta = 'generarEtiquetaCena';
-
 } elseif ($tipo == 'Col_Vespertina' && $paciente == 'Todos') {
 
     $query = "SELECT * FROM dietas WHERE area = 'CIRUGÍA GENERAL' AND DATE(Fecha_Hora_Creacion) = CURDATE()";
     $result = mysqli_query($con, $query);
     $datos = mysqli_fetch_all($result, MYSQLI_ASSOC);
     $generarEtiqueta = 'generarEtiquetaColNocturna';
-
-}elseif ($tipo == 'Desayuno' && $paciente != 'Todos') {
+} elseif ($tipo == 'Desayuno' && $paciente != 'Todos') {
 
     $query = "SELECT * FROM dietas WHERE area = 'CIRUGÍA GENERAL' AND Nombre_Paciente = '$paciente' AND DATE(Fecha_Hora_Creacion) = CURDATE()";
     $result = mysqli_query($con, $query);
     $datos = mysqli_fetch_all($result, MYSQLI_ASSOC);
     $generarEtiqueta = 'generarEtiquetaDesayuno';
-
-}elseif ($tipo == 'Col_Matutina' && $paciente != 'Todos') {
+} elseif ($tipo == 'Col_Matutina' && $paciente != 'Todos') {
 
     $query = "SELECT * FROM dietas WHERE area = 'CIRUGÍA GENERAL' AND Nombre_Paciente = '$paciente' AND DATE(Fecha_Hora_Creacion) = CURDATE()";
     $result = mysqli_query($con, $query);
     $datos = mysqli_fetch_all($result, MYSQLI_ASSOC);
     $generarEtiqueta = 'generarEtiquetaColMatutina';
-
-}elseif ($tipo == 'Comida' && $paciente != 'Todos') {
+} elseif ($tipo == 'Comida' && $paciente != 'Todos') {
 
     $query = "SELECT * FROM dietas WHERE area = 'CIRUGÍA GENERAL' AND Nombre_Paciente = '$paciente' AND DATE(Fecha_Hora_Creacion) = CURDATE()";
     $result = mysqli_query($con, $query);
     $datos = mysqli_fetch_all($result, MYSQLI_ASSOC);
     $generarEtiqueta = 'generarEtiquetaComida';
-
-}elseif ($tipo == 'Col_Vespertina' && $paciente != 'Todos') {
+} elseif ($tipo == 'Col_Vespertina' && $paciente != 'Todos') {
 
     $query = "SELECT * FROM dietas WHERE area = 'CIRUGÍA GENERAL' AND Nombre_Paciente = '$paciente' AND DATE(Fecha_Hora_Creacion) = CURDATE()";
     $result = mysqli_query($con, $query);
     $datos = mysqli_fetch_all($result, MYSQLI_ASSOC);
     $generarEtiqueta = 'generarEtiquetaColVespertina';
-
-}elseif ($tipo == 'Cena' && $paciente != 'Todos') {
+} elseif ($tipo == 'Cena' && $paciente != 'Todos') {
 
     $query = "SELECT * FROM dietas WHERE area = 'CIRUGÍA GENERAL' AND Nombre_Paciente = '$paciente' AND DATE(Fecha_Hora_Creacion) = CURDATE()";
     $result = mysqli_query($con, $query);
     $datos = mysqli_fetch_all($result, MYSQLI_ASSOC);
     $generarEtiqueta = 'generarEtiquetaCena';
-
-}elseif ($tipo == 'Col_Nocturna' && $paciente != 'Todos') {
+} elseif ($tipo == 'Col_Nocturna' && $paciente != 'Todos') {
 
     $query = "SELECT * FROM dietas WHERE area = 'CIRUGÍA GENERAL' AND Nombre_Paciente = '$paciente' AND DATE(Fecha_Hora_Creacion) = CURDATE()";
     $result = mysqli_query($con, $query);
     $datos = mysqli_fetch_all($result, MYSQLI_ASSOC);
     $generarEtiqueta = 'generarEtiquetaColNocturna';
-
 }
 
 $exiteImpresora = new ExisteImpresoraWindows();
 $epl = new ImprimirEpl();
-$nombre_impresora = "TSC_DA210"; 
+$nombre_impresora = "TSC_DA210";
 
-if ($exiteImpresora->verificarImpresora($nombre_impresora, true)) {
-    // Imprimir etiquetas
+if ($exiteImpresora->verificarImpresora($nombre_impresora, true)) { 
+    // Imprimir etiquetas                 
     foreach ($datos as $dato) {
         $etiqueta = $generarEtiqueta($dato);
         $yPos = 15; // Posición inicial en Y

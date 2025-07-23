@@ -47,8 +47,8 @@ document.getElementById('btnActualizar').addEventListener('click', function (eve
             // Muestra el mensaje según la respuesta
             if (data.status === 'success') {
                 alert(data.message); // Paciente actualizado exitosamente
-                //window.location.replace("http://localhost/AlimentosIgsa/pacientes.php");
-                window.location.replace("http://10.1.7.230:8080/Alimentos/pacientes.php");
+                window.location.replace("http://localhost/AlimentosIgsa/pacientes.php");
+                //window.location.replace("http://10.1.7.230:8080/Alimentos/pacientes.php");
             } else {
                 alert(data.message); // El ID ingresado para paciente ya existe, valide los datos
             }

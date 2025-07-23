@@ -22,7 +22,7 @@ $sql = "SELECT * FROM pacientes";
 $query = mysqli_query($con, $sql);
 
 $html = '<h1 style="text-align: center;">Reporte de Pacientes</h1>';
-$html .= '<table border="1" style="width:100%; border-collapse: collapse; font-size: 10px;">';
+$html .= '<table border="1" style="width:100%; border-collapse: collapse; font-size: 7px;">';
 $html .= '<thead>
             <tr>
               <th>Nombre del Paciente</th>

@@ -12,11 +12,9 @@ if (!isset($_SESSION['resultado'])) {
 $sesionUsuario = $sesi['usuario']; // Reemplaza con el nombre exacto de la columna
 $sesionNombre = $sesi['nombre'];   // Reemplaza con el nombre exacto de la columna
 
-
 // Consulta SQL para obtener los datos de los pacientes
 $sql = "SELECT * FROM pacientes";
 $query = mysqli_query($con, $sql);
-
 
 ?>
 
@@ -35,6 +33,13 @@ $query = mysqli_query($con, $sql);
   <script src="js/color-modes.js"></script>
   <link rel="stylesheet" href="node_modules/bootstrap-icons/font/bootstrap-icons.min.css">
 
+  <style>
+    resaltado {
+      background-color: rgb(76, 182, 67) !important;
+      color: white !important;
+      transition: background-color 0.5s ease;
+    }
+  </style>
 </head>
 
 <body class="vh-100">
@@ -48,6 +53,16 @@ $query = mysqli_query($con, $sql);
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
           <h3 class="h3">PACIENTES</h3>
           <div class="btn-toolbar mb-2 mb-md-0">
+
+            <form id="filtroPaciente" target="_blank">
+              <div class="btn-group me-2">
+                <input type="text" id="idPaciente" name="nombre_completo" class="form-control form-control-sm" placeholder="ID Paciente">
+              </div>
+              <div class="btn-group me-5">
+                <input type="text" id="nombrePaciente" name="nombre_completo" class="form-control form-control-sm" placeholder="Nombre Paciente">
+              </div>
+            </form>
+
             <form method="post" action="pdfPacientes.php" target="_blank">
               <div class="btn-group me-2">
                 <button type="submit" class="btn btn-sm btn-outline-secondary">
@@ -55,11 +70,13 @@ $query = mysqli_query($con, $sql);
                 </button>
               </div>
             </form>
+
             <div class="btn-group me-2">
               <button type="button" class="btn btn-sm btn-outline-secondary" onclick="location.href = 'pacientes.php';">
                 <i class="bi bi-arrow-clockwise"></i>
               </button>
             </div>
+
           </div>
         </div>
       </div>
@@ -89,7 +106,7 @@ $query = mysqli_query($con, $sql);
                 <th class="text-center">Acciones</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody id="tablaPacientes">
               <?php while ($dataRow = mysqli_fetch_array($query)) { ?>
                 <tr>
                   <td class="text-center"><?= $dataRow["nombre"] ?></td>
@@ -120,23 +137,18 @@ $query = mysqli_query($con, $sql);
           </table>
         </div>
       </div>
-
-
-
-
     </main>
-
-
-
 
   </div>
   <script src="node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
   <script src="node_modules/chart.js/dist/chart.umd.js"></script>
   <script type="text/javascript" src="node_modules/jquery/dist/jquery.min.js"></script>
   <script src="js/sidebars.js"></script>
+  <script src="js/pacientes.js"></script>
+  <script src="js/seguridad.js"></script>
 
   <?php include 'footer.php'; ?>
-</body>
 
+</body>
 
 </html>
