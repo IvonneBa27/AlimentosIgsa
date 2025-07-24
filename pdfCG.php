@@ -1,5 +1,6 @@
 <?php
 require 'vendor/autoload.php';
+
 use Dompdf\Dompdf;
 
 include("conexion.php");
@@ -11,10 +12,31 @@ if (!isset($_SESSION['resultado'])) {
 } else {
   $sesi = $_SESSION['resultado'];
 }
-$sesionUsuario = $sesi['usuario']; // Reemplaza con el nombre exacto de la columna
-$sesionNombre = $sesi['nombre'];   // Reemplaza con el nombre exacto de la columna
+$sesionUsuario = $sesi['usuario']; 
+$sesionNombre = $sesi['nombre'];   
 
-$sql = "SELECT p.*, d.*, p.idPaciente AS pacienteID, d.idPaciente AS dietaID
+$fechaHoraActual1 = date("Y-m-d");
+$sql = "SELECT    
+    p.idPaciente AS pacienteID_pacientes, 
+    p.area AS area_pacientes,
+    p.nombre,
+    p.fechaNacimiento,
+    p.cama,
+    p.edad,
+    p.diagnosticoMed,
+    p.prescripcionNutri,
+    p.observaciones,
+    p.controlTamizaje,
+    d.idPaciente AS pacienteID_dietas,
+    d.area AS area_dietas,
+    d.Fecha_Hora_Creacion,
+    d.Desayuno,
+    d.Col_Matutina,
+    d.Comida,
+    d.Col_Vespertina,
+    d.Cena,
+    d.Col_Nocturna,
+    d.Creado_por
 FROM pacientes p
 LEFT JOIN (
     SELECT d1.*
@@ -22,27 +44,39 @@ LEFT JOIN (
     INNER JOIN ( 
         SELECT MAX(ID) AS ID, idPaciente
         FROM dietas
-        WHERE area = 'CIRUGÍA GENERAL'
+        WHERE area = 'CIRUGÍA GENERAL' AND DATE(Fecha_Hora_Creacion) = '$fechaHoraActual1'
         GROUP BY idPaciente
     ) d2 ON d1.ID = d2.ID
 ) d ON p.idPaciente = d.idPaciente
-WHERE p.statusP = 'Activo' AND p.area = 'CIRUGÍA GENERAL'";
+WHERE p.statusP = 'Activo' AND p.area = 'CIRUGÍA GENERAL'
+ORDER BY 
+CASE 
+ WHEN p.cama LIKE 'A-%' THEN 1
+ ELSE 2
+END, 
+CAST(
+CASE 
+WHEN p.cama LIKE '%-%' THEN SUBSTRING_INDEX(p.cama, '-', -1)
+ELSE p.cama
+END AS UNSIGNED
+)";
 
-    
+
+
 $query = mysqli_query($con, $sql);
 
 $datosCombinados = array();
 
 if ($query->num_rows > 0) {
-    while ($row = $query->fetch_assoc()) {
-        $datosCombinados[] = $row;
-    }
+  while ($row = $query->fetch_assoc()) {
+    $datosCombinados[] = $row;
+  }
 } else {
-    echo "0 resultados";
+  echo "0 resultados";
 }
 
 $html = '<h1 style="text-align: center;">Reporte de Dietas (Cirugía General)</h1>';
-$html .= '<table border="1" style="width: 100%; border-collapse: collapse; font-size: 10px;">';
+$html .= '<table border="1" style="width: 100%; border-collapse: collapse; font-size: 7px;">';
 $html .= '<thead>
             <tr>
               <th>Fecha de Solicitud</th>
@@ -67,14 +101,14 @@ $html .= '<thead>
           </thead>';
 $html .= '<tbody>';
 foreach ($datosCombinados as $dataRow) {
-    $html .= '<tr>
+  $html .= '<tr>
                 <td>' . $dataRow["Fecha_Hora_Creacion"] . '</td>
-                <td>' . $dataRow["area"] . '</td>
-                <td>' . $dataRow["idPaciente"] . '</td>
+                <td>' . $dataRow["area_pacientes"] . '</td>
+                <td>' . $dataRow["pacienteID_pacientes"] . '</td>
                 <td>' . $dataRow["nombre"] . '</td>
-                <td>' . $dataRow["Fecha_Nacimiento_Paciente"] . '</td>
-                <td>' . $dataRow["Cama_Paciente"] . '</td>
-                <td>' . $dataRow["Edad"] . '</td>
+                <td>' . $dataRow["fechaNacimiento"] . '</td>
+                <td>' . $dataRow["cama"] . '</td>
+                <td>' . $dataRow["edad"] . '</td>
                 <td>' . $dataRow["diagnosticoMed"] . '</td>
                 <td>' . $dataRow["prescripcionNutri"] . '</td>
                 <td>' . $dataRow["Desayuno"] . '</td>
@@ -95,4 +129,3 @@ $dompdf->loadHtml($html);
 $dompdf->setPaper('A4', 'landscape');
 $dompdf->render();
 $dompdf->stream("reporte_dietas.pdf", array("Attachment" => 0));
-?>

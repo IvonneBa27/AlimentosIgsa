@@ -19,12 +19,21 @@ $sesionNombre = $sesi['nombre'];   // Reemplaza con el nombre exacto de la colum
 
 $fechaFiltro = isset($_GET['fechaFiltro']) && !empty($_GET['fechaFiltro']) ? $_GET['fechaFiltro'] : $fechaHoraActual;
 
-/*$consulta = "SELECT * FROM dietas WHERE (area = 'CIRUGÍA GENERAL' OR privados = 'APLICA') AND DATE(Fecha_Hora_Creacion) = '$fechaFiltro' ORDER BY ID DESC";*/
-$consulta = "SELECT * FROM dietas WHERE area = 'CIRUGÍA GENERAL' AND DATE(Fecha_Hora_Creacion) = '$fechaFiltro' ORDER BY ID DESC";
+$consulta = "SELECT * FROM dietas d WHERE area = 'CIRUGÍA GENERAL' AND DATE(Fecha_Hora_Creacion) = '$fechaFiltro' ORDER BY 
+CASE 
+ WHEN Cama_Paciente LIKE 'A-%' THEN 1
+ ELSE 2
+END, 
+CAST(
+CASE 
+WHEN Cama_Paciente LIKE '%-%' THEN SUBSTRING_INDEX(Cama_Paciente, '-', -1)
+ELSE Cama_Paciente
+END AS UNSIGNED
+)";
 $query = mysqli_query($con, $consulta);
 
 $html = '<h1 style="text-align: center;">Reporte de Dietas</h1>';
-$html .= '<table border="1" style="width:100%; border-collapse: collapse; font-size: 10px;">';
+$html .= '<table border="1" style="width:100%; border-collapse: collapse; font-size: 7px;">';
 $html .= '<thead>
             <tr>
               <th>Fecha de Solicitud</th>

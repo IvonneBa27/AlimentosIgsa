@@ -10,7 +10,8 @@ function obtenerFechaHoraDelServidor() {
             console.log('Fecha y Hora Actual:', fechaHoraActual); // Depuración
             document.getElementById('fechaHoraActual').value = fechaHoraActual;
             rangoHoraActual = verificarRangoHora(fechaHoraActual);
-            console.log('Rango Hora Actual:', rangoHoraActual); // Para depuración
+            verificarYActualizarColumnaBloqueo(fechaHoraActual); //Aquí se llama
+            //console.log('Rango Hora Actual:', rangoHoraActual); // Para depuración
             resaltarTextarea(rangoHoraActual);
         }
     };
@@ -24,9 +25,9 @@ window.onload = obtenerFechaHoraDelServidor;
 function verificarRangoHora(fechaHora) {
     var rangos = [
         { inicio: '07:00', fin: '08:30', campo: 'Desayuno' },
-        { inicio: '09:30', fin: '11:30', campo: 'Col_Matutina' },
-        { inicio: '11:00', fin: '13:30', campo: 'Comida' },
-        { inicio: '13:30', fin: '15:30', campo: 'Col_Vespertina' },
+        { inicio: '09:30', fin: '10:30', campo: 'Col_Matutina' },
+        { inicio: '11:00', fin: '12:30', campo: 'Comida' },
+        { inicio: '15:00', fin: '16:00', campo: 'Col_Vespertina' },
         { inicio: '16:30', fin: '17:30', campo: 'Cena' },
         { inicio: '20:00', fin: '21:00', campo: 'Col_Nocturna' }
     ];
@@ -128,6 +129,9 @@ function toggleEdit(checkbox) {
 }
 
 function guardarCambio(idPaciente, datos) {
+    // Guardar la posición del scroll antes de cualquier acción
+    var contenedor = document.getElementById('contenedorScroll');
+    localStorage.setItem('scrollTopContenedor', contenedor.scrollTop);
     // Mostrar mensaje de confirmación
     var confirmar = confirm("¿Estás seguro de que deseas guardar los cambios?");
 
@@ -149,6 +153,186 @@ function guardarCambio(idPaciente, datos) {
         location.reload();
     }
 }
+
+
+window.addEventListener('load', function () {
+    var contenedor = document.getElementById('contenedorScroll');
+    var scrollTop = localStorage.getItem('scrollTopContenedor');
+    if (scrollTop !== null) {
+        contenedor.scrollTop = parseInt(scrollTop);
+        localStorage.removeItem('scrollTopContenedor');
+    }
+});
+
+let columnaBloqueoVisible = false;
+
+function verificarYActualizarColumnaBloqueo(fechaHoraActual) {
+    const hora = fechaHoraActual.getHours();
+    const minutos = fechaHoraActual.getMinutes();
+    const dentroDelRango = (hora > 10 || (hora === 10 && minutos >= 10)) && hora < 21;
+
+    const tabla = document.getElementById("miTabla");
+
+    if (dentroDelRango && !columnaBloqueoVisible) {
+        const theadRows = tabla.querySelectorAll("thead tr");
+        theadRows.forEach((tr, index) => {
+            const th = document.createElement("th");
+            th.className = "text-center columna-bloqueo";
+
+            if (index === 0) {
+                th.innerHTML = `<span>Solicitud día siguiente</span><br><button class="btn btn-success btn-sm mt-1" onclick="enviarDatosBloqueo()">Enviar datos</button>`;
+            } else {
+                th.textContent = "Desayuno";
+            }
+
+            tr.appendChild(th);
+        });
+
+        const filas = tabla.querySelectorAll("tbody tr");
+        filas.forEach(fila => {
+            const td = document.createElement("td");
+            td.className = "text-center columna-bloqueo";
+            td.innerHTML = `<textarea class="form-control table-textarea" placeholder="Desayuno.." data-campo="bloqueo"></textarea>`;
+            fila.appendChild(td);
+        });
+
+        columnaBloqueoVisible = true;
+    }
+}
+
+function enviarDatosBloqueo() {
+    const tabla = document.getElementById("miTabla");
+    const filas = tabla.querySelectorAll("tbody tr");
+    const datos = [];
+
+    filas.forEach(fila => {
+        const getCampo = campo => {
+            const celda = fila.querySelector(`td[data-campo="${campo}"]`);
+            return celda ? celda.textContent.trim() : "";
+        };
+
+        const getInputCampo = campo => {
+            const celda = fila.querySelector(`td[data-campo="${campo}"]`);
+            const input = celda ? celda.querySelector("input") : null;
+            return input ? input.value.trim() : "";
+        };
+
+        const getTextarea = campo => {
+            const textarea = fila.querySelector(`textarea[data-campo="${campo}"]`);
+            return textarea ? textarea.value.trim() : "";
+        };
+
+        const registro = {
+            idPaciente: getCampo("idPaciente"),
+            nombre: getCampo("nombre"),
+            fechaNacimiento: getCampo("fechaNacimiento"),
+            cama: getCampo("cama"),
+            edad: getCampo("edad"),
+            edadMeses: getCampo("edadMeses"),
+            edadDias: getCampo("edadDias"),
+            diagnosticoMed: getCampo("diagnosticoMed"),
+            prescripcionNutri: getCampo("prescripcionNutri"),
+            observaciones: getCampo("observaciones"),
+            controlTamizaje: getCampo("controlTamizaje"),
+            vip: getCampo("vip"),
+            usuario: getCampo("usuario"),
+            desayuno: getTextarea("bloqueo")
+        };
+
+        if (registro.idPaciente && registro.desayuno !== "") {
+            datos.push(registro);
+        }
+    });
+
+    if (datos.length > 0) {
+        fetch("guardar_bloqueosCG.php", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ registros: datos })
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log("Datos guardados:", data);
+                alert("Datos enviados correctamente");
+
+                // Recargar los datos en los textarea sin recargar la página
+                cargarDatosBloqueo();
+
+
+                // Eliminar columna después de enviar
+                //const columnas = tabla.querySelectorAll(".columna-bloqueo");
+                //columnas.forEach(col => col.remove());
+                //columnaBloqueoVisible = false;11
+            })
+            .catch(error => {
+                console.error("Error al guardar los datos:", error);
+                alert("Error al enviar los datos");
+            });
+    } else {
+        alert("No hay datos para enviar.");
+    }
+}
+
+
+
+
+window.addEventListener("DOMContentLoaded", () => {
+    fetch("guardar_bloqueosCG.php") 
+        .then(response => response.json())
+        .then(data => {
+            const filas = document.querySelectorAll("#miTabla tbody tr");
+
+            filas.forEach(fila => {
+                const idPaciente = fila.querySelector('td[data-campo="idPaciente"]').textContent.trim();
+                const desayuno = data[idPaciente];
+
+                if (desayuno !== undefined) {
+                    const textarea = fila.querySelector('textarea[data-campo="bloqueo"]');
+                    if (textarea) {
+                        textarea.value = desayuno;
+                    }
+                }
+            });
+        })
+        .catch(error => {
+            console.error("Error al cargar los datos:", error);
+        });
+});
+
+
+
+
+
+function cargarDatosBloqueo() {
+    fetch("guardar_bloqueosCG.php") // o "obtener_bloqueosCG.php" si lo tienes separado
+        .then(response => response.json())
+        .then(data => {
+            const filas = document.querySelectorAll("#miTabla tbody tr");
+
+            filas.forEach(fila => {
+                const idPaciente = fila.querySelector('td[data-campo="idPaciente"]').textContent.trim();
+                const desayuno = data[idPaciente];
+
+                if (desayuno !== undefined) {
+                    const textarea = fila.querySelector('textarea[data-campo="bloqueo"]');
+                    if (textarea) {
+                        textarea.value = desayuno;
+                    }
+                }
+            });
+        })
+        .catch(error => {
+            console.error("Error al cargar los datos:", error);
+        });
+}
+window.addEventListener("DOMContentLoaded", cargarDatosBloqueo);
+
+
+
+
+
 
 
 

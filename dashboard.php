@@ -73,6 +73,7 @@ $sesionNombre = $sesi['nombre'];   // Reemplaza con el nombre exacto de la colum
     </main>
   </div>
 
+      <script src="js/seguridad.js"></script>
   <?php include 'footer.php'; ?>
 </body>
 

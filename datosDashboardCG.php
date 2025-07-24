@@ -8,18 +8,6 @@ $fechaFiltro = isset($_GET['fechaFiltro']) && !empty($_GET['fechaFiltro']) ? $_G
 $inicio_semana = date('Y-m-d', strtotime('monday this week', strtotime($fechaFiltro)));
 $fin_semana = date('Y-m-d', strtotime('sunday this week', strtotime($fechaFiltro)));
 
-/*$sql = "SELECT 
-    ds.nombre_dia,
-    IFNULL(COUNT(d.Fecha_Hora_Creacion), 0) AS cantidad
-FROM 
-    dias_semana ds
-LEFT JOIN 
-    dietas d ON DAYOFWEEK(DATE(d.Fecha_Hora_Creacion)) = ds.dia_semana
-    AND DATE(d.Fecha_Hora_Creacion) BETWEEN '$inicio_semana' AND '$fin_semana' AND area = 'CIRUGÍA GENERAL'
-GROUP BY 
-    ds.dia_semana
-ORDER BY 
-    ds.dia_semana";*/
     $sql = "SELECT 
     ds.nombre_dia,
     IFNULL(SUM(

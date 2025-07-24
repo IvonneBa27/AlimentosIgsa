@@ -13,7 +13,7 @@ $sesionUsuario = $sesi['usuario']; // Reemplaza con el nombre exacto de la colum
 $sesionNombre = $sesi['nombre'];   // Reemplaza con el nombre exacto de la columna
 
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+/*if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $idPaciente = $_POST['idPaciente'];
     $datos = json_decode($_POST['datos'], true); // Decodificar JSON a array
     $rangoHoraActual = $datos['rangoHoraActual']; // Obtener el rango de hora actual
@@ -23,7 +23,48 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     guardarOActualizarDieta($idPaciente, $datos, $rangoHoraActual);
     exit;
+}*/
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $idPaciente = $_POST['idPaciente'];
+
+    // Decodificar los datos del paciente
+    $datosPaciente = isset($_POST['datosPaciente']) ? json_decode($_POST['datosPaciente'], true) : null;
+
+    // Decodificar los datos de las filas adicionales (puede ser un array vacío)
+    $datosFamiliares = isset($_POST['datosFamiliares']) ? json_decode($_POST['datosFamiliares'], true) : [];
+
+    // Procesar datos del paciente
+    if ($datosPaciente) {
+        $rangoHoraActual = $datosPaciente['rangoHoraActual'];
+        guardarOActualizarDieta($idPaciente, $datosPaciente, $rangoHoraActual);
+    }
+
+    // Procesar filas adicionales si existen
+    if (!empty($datosFamiliares)) {
+        $cantidadFilas = count($datosFamiliares);
+
+        // Validar que no se excedan 3 filas
+        if ($cantidadFilas > 3) {
+            http_response_code(400);
+            echo "Error: No se pueden enviar más de 3 filas adicionales.";
+            exit;
+        }
+
+        // Procesar cada fila adicional
+        foreach ($datosFamiliares as $familiar) {
+            if (!isset($familiar['idPacienteF'])) continue;
+
+            $rangoHoraActual = $familiar['rangoHoraActual'];
+            guardarOActualizarDietaFamiliar($familiar['idPacienteF'], $familiar, $rangoHoraActual);
+        }
+    }
+
+    echo "Datos guardados correctamente.";
+    exit;
 }
+
+
 
 
 function guardarOActualizarDieta($idPaciente, $datos, $rangoHoraActual)
@@ -69,42 +110,42 @@ function guardarOActualizarDieta($idPaciente, $datos, $rangoHoraActual)
         // Dependiendo del rango de hora actual, realizar la consulta correspondiente
         if ($rangoHoraActual == 'Desayuno') {
             $insert = "INSERT INTO updatedesayunos (ID, idDieta, IdPaciente, fechaHora, Desayuno, area, modificadoPor) 
-                       VALUES ('', '$idDieta', '$idPaciente', '$fechaHoraActual', '$desayuno', '$area', '$usuario')";
+                       VALUES ('', '$idDieta', '$idPaciente', '$fechaHoraActual', '$desayuno', 'GINECOLOGÍA', '$usuario')";
             mysqli_query($con, $insert);
             $sqlUpdate = "UPDATE dietas SET Nombre_Paciente = '$nombre', Fecha_Nacimiento_Paciente = '$fechaNacimiento', Cama_Paciente = '$cama', Edad = '$edad', Diag_Med_Nutri = '$diagnosticoMed', Prescripcion = '$prescripcionNutri', Desayuno = '$desayuno', Col_Matutina = '$colMatutina', Comida = '$comida', Col_Vespertina = '$colVespertina', Cena = '$cena', Col_Nocturna = '$colNocturna', Observaciones = '$observaciones', Control_Tamizaje = '$controlTamizaje', privados = '$vip', Fecha_Hora_Creacion = '$fechaHoraActual', Creado_por = '$usuario' WHERE idPaciente = '$idPaciente' AND DATE(Fecha_Hora_Creacion) = '$fechaHoy'";
             mysqli_query($con, $sqlUpdate);
         } elseif ($rangoHoraActual == 'Col_Matutina') {
             // Realizar la consulta correspondiente a Col_Matutina
             $insert = "INSERT INTO updatecol_matutina (ID, idDieta, IdPaciente, fechaHora, Col_Matutina, area, modificadoPor) 
-            VALUES ('', '$idDieta', '$idPaciente', '$fechaHoraActual', '$colMatutina', '$area', '$usuario')";
+            VALUES ('', '$idDieta', '$idPaciente', '$fechaHoraActual', '$colMatutina', 'GINECOLOGÍA', '$usuario')";
             mysqli_query($con, $insert);
             $sqlUpdate = "UPDATE dietas SET Nombre_Paciente = '$nombre', Fecha_Nacimiento_Paciente = '$fechaNacimiento', Cama_Paciente = '$cama', Edad = '$edad', Diag_Med_Nutri = '$diagnosticoMed', Prescripcion = '$prescripcionNutri', Desayuno = '$desayuno', Col_Matutina = '$colMatutina', Comida = '$comida', Col_Vespertina = '$colVespertina', Cena = '$cena', Col_Nocturna = '$colNocturna', Observaciones = '$observaciones', Control_Tamizaje = '$controlTamizaje', privados = '$vip', Fecha_Hora_Creacion = '$fechaHoraActual', Creado_por = '$usuario' WHERE idPaciente = '$idPaciente' AND DATE(Fecha_Hora_Creacion) = '$fechaHoy'";
             mysqli_query($con, $sqlUpdate);
         } elseif ($rangoHoraActual == 'Comida') {
             // Realizar la consulta correspondiente a Comida
             $insert = "INSERT INTO updatecomida (ID, idDieta, IdPaciente, fechaHora, Comida, area, modificadoPor) 
-            VALUES ('', '$idDieta', '$idPaciente', '$fechaHoraActual', '$comida', '$area', '$usuario')";
+            VALUES ('', '$idDieta', '$idPaciente', '$fechaHoraActual', '$comida', 'GINECOLOGÍA', '$usuario')";
             mysqli_query($con, $insert);
             $sqlUpdate = "UPDATE dietas SET Nombre_Paciente = '$nombre', Fecha_Nacimiento_Paciente = '$fechaNacimiento', Cama_Paciente = '$cama', Edad = '$edad', Diag_Med_Nutri = '$diagnosticoMed', Prescripcion = '$prescripcionNutri', Desayuno = '$desayuno', Col_Matutina = '$colMatutina', Comida = '$comida', Col_Vespertina = '$colVespertina', Cena = '$cena', Col_Nocturna = '$colNocturna', Observaciones = '$observaciones', Control_Tamizaje = '$controlTamizaje', privados = '$vip', Fecha_Hora_Creacion = '$fechaHoraActual', Creado_por = '$usuario' WHERE idPaciente = '$idPaciente' AND DATE(Fecha_Hora_Creacion) = '$fechaHoy'";
             mysqli_query($con, $sqlUpdate);
         } elseif ($rangoHoraActual == 'Col_Vespertina') {
             // Realizar la consulta correspondiente a Col_Vespertina
             $insert = "INSERT INTO updatecol_vespertina (ID, idDieta, IdPaciente, fechaHora, Col_Vespertina, area, modificadoPor) 
-            VALUES ('', '$idDieta', '$idPaciente', '$fechaHoraActual', '$colVespertina', '$area', '$usuario')";
+            VALUES ('', '$idDieta', '$idPaciente', '$fechaHoraActual', '$colVespertina', 'GINECOLOGÍA', '$usuario')";
             mysqli_query($con, $insert);
             $sqlUpdate = "UPDATE dietas SET Nombre_Paciente = '$nombre', Fecha_Nacimiento_Paciente = '$fechaNacimiento', Cama_Paciente = '$cama', Edad = '$edad', Diag_Med_Nutri = '$diagnosticoMed', Prescripcion = '$prescripcionNutri', Desayuno = '$desayuno', Col_Matutina = '$colMatutina', Comida = '$comida', Col_Vespertina = '$colVespertina', Cena = '$cena', Col_Nocturna = '$colNocturna', Observaciones = '$observaciones', Control_Tamizaje = '$controlTamizaje', privados = '$vip', Fecha_Hora_Creacion = '$fechaHoraActual', Creado_por = '$usuario' WHERE idPaciente = '$idPaciente' AND DATE(Fecha_Hora_Creacion) = '$fechaHoy'";
             mysqli_query($con, $sqlUpdate);
         } elseif ($rangoHoraActual == 'Cena') {
             // Realizar la consulta correspondiente a Cena
             $insert = "INSERT INTO updatecena (ID, idDieta, IdPaciente, fechaHora, Cena, area, modificadoPor) 
-            VALUES ('', '$idDieta', '$idPaciente', '$fechaHoraActual', '$cena', '$area', '$usuario')";
+            VALUES ('', '$idDieta', '$idPaciente', '$fechaHoraActual', '$cena', 'GINECOLOGÍA', '$usuario')";
             mysqli_query($con, $insert);
             $sqlUpdate = "UPDATE dietas SET Nombre_Paciente = '$nombre', Fecha_Nacimiento_Paciente = '$fechaNacimiento', Cama_Paciente = '$cama', Edad = '$edad', Diag_Med_Nutri = '$diagnosticoMed', Prescripcion = '$prescripcionNutri', Desayuno = '$desayuno', Col_Matutina = '$colMatutina', Comida = '$comida', Col_Vespertina = '$colVespertina', Cena = '$cena', Col_Nocturna = '$colNocturna', Observaciones = '$observaciones', Control_Tamizaje = '$controlTamizaje', privados = '$vip', Fecha_Hora_Creacion = '$fechaHoraActual', Creado_por = '$usuario' WHERE idPaciente = '$idPaciente' AND DATE(Fecha_Hora_Creacion) = '$fechaHoy'";
             mysqli_query($con, $sqlUpdate);
         } elseif ($rangoHoraActual == 'Col_Nocturna') {
             // Realizar la consulta correspondiente a Col_Nocturna
             $insert = "INSERT INTO updatecol_nocturna (ID, idDieta, IdPaciente, fechaHora, Col_Nocturna, area, modificadoPor) 
-            VALUES ('', '$idDieta', '$idPaciente', '$fechaHoraActual', '$colNocturna', '$area', '$usuario')";
+            VALUES ('', '$idDieta', '$idPaciente', '$fechaHoraActual', '$colNocturna', 'GINECOLOGÍA', '$usuario')";
             mysqli_query($con, $insert);
             $sqlUpdate = "UPDATE dietas SET Nombre_Paciente = '$nombre', Fecha_Nacimiento_Paciente = '$fechaNacimiento', Cama_Paciente = '$cama', Edad = '$edad', Diag_Med_Nutri = '$diagnosticoMed', Prescripcion = '$prescripcionNutri', Desayuno = '$desayuno', Col_Matutina = '$colMatutina', Comida = '$comida', Col_Vespertina = '$colVespertina', Cena = '$cena', Col_Nocturna = '$colNocturna', Observaciones = '$observaciones', Control_Tamizaje = '$controlTamizaje', privados = '$vip', Fecha_Hora_Creacion = '$fechaHoraActual', Creado_por = '$usuario' WHERE idPaciente = '$idPaciente' AND DATE(Fecha_Hora_Creacion) = '$fechaHoy'";
             mysqli_query($con, $sqlUpdate);
@@ -128,14 +169,363 @@ function guardarOActualizarDieta($idPaciente, $datos, $rangoHoraActual)
         $vip = $datos['vip'];
         $usuario = $datos['usuario'];
 
-        $sqlInsert = "INSERT INTO dietas 
+        if ($rangoHoraActual == 'Desayuno') {
+
+            $sqlInsert = "INSERT INTO dietas 
                (ID, Nombre_Paciente, Fecha_Nacimiento_Paciente, idPaciente, Cama_Paciente, Edad, Diag_Med_Nutri, Prescripcion, Desayuno, Col_Matutina, Comida, Col_Vespertina, Cena, Col_Nocturna, Observaciones, Control_Tamizaje, area, privados, Fecha_Hora_Creacion, Creado_por) 
-        VALUES ('', '$nombre', '$fechaNacimiento','$idPaciente', '$cama', '$edad', '$diagnosticoMed', '$prescripcionNutri', '$desayuno', '$colMatutina', '$comida', '$colVespertina', '$cena', '$colNocturna', '$observaciones', '$controlTamizaje', 'GINECOLOGÍA', '$vip', '$fechaHoraActual', '$usuario')";
-        mysqli_query($con, $sqlInsert);
+        VALUES ('', '$nombre', '$fechaNacimiento','$idPaciente', '$cama', '$edad', '$diagnosticoMed', '$prescripcionNutri', '$desayuno', '', '', '', '', '', '$observaciones', '$controlTamizaje', 'GINECOLOGÍA', '$vip', '$fechaHoraActual', '$usuario')";
+            mysqli_query($con, $sqlInsert);
+
+            $fechaHoy1 = date("Y-m-d");
+            $obtenerIdDieta = "SELECT * FROM dietas WHERE idPaciente = '$idPaciente' AND DATE(Fecha_Hora_Creacion) = '$fechaHoy1'";
+            $queryDietas = mysqli_query($con, $obtenerIdDieta);
+            $result = mysqli_fetch_assoc($queryDietas);
+            $idDieta = $result['ID'];
+
+            $insert = "INSERT INTO updatedesayunos (ID, idDieta, IdPaciente, fechaHora, Desayuno, area, modificadoPor) 
+                       VALUES ('', '$idDieta', '$idPaciente', '$fechaHoraActual', '$desayuno', 'GINECOLOGÍA', '$usuario')";
+            mysqli_query($con, $insert);
+        } elseif ($rangoHoraActual == 'Col_Matutina') {
+
+            $sqlInsert = "INSERT INTO dietas 
+               (ID, Nombre_Paciente, Fecha_Nacimiento_Paciente, idPaciente, Cama_Paciente, Edad, Diag_Med_Nutri, Prescripcion, Desayuno, Col_Matutina, Comida, Col_Vespertina, Cena, Col_Nocturna, Observaciones, Control_Tamizaje, area, privados, Fecha_Hora_Creacion, Creado_por) 
+        VALUES ('', '$nombre', '$fechaNacimiento','$idPaciente', '$cama', '$edad', '$diagnosticoMed', '$prescripcionNutri', '', '$colMatutina', '', '', '', '', '$observaciones', '$controlTamizaje', 'GINECOLOGÍA', '$vip', '$fechaHoraActual', '$usuario')";
+            mysqli_query($con, $sqlInsert);
+
+            $fechaHoy1 = date("Y-m-d");
+            $obtenerIdDieta = "SELECT * FROM dietas WHERE idPaciente = '$idPaciente' AND DATE(Fecha_Hora_Creacion) = '$fechaHoy1'";
+            $queryDietas = mysqli_query($con, $obtenerIdDieta);
+            $result = mysqli_fetch_assoc($queryDietas);
+            $idDieta = $result['ID'];
+
+            $insert = "INSERT INTO updatecol_matutina (ID, idDieta, IdPaciente, fechaHora, Col_Matutina, area, modificadoPor) 
+            VALUES ('', '$idDieta', '$idPaciente', '$fechaHoraActual', '$colMatutina', 'GINECOLOGÍA', '$usuario')";
+            mysqli_query($con, $insert);
+        } elseif ($rangoHoraActual == 'Comida') {
+
+            $sqlInsert = "INSERT INTO dietas 
+               (ID, Nombre_Paciente, Fecha_Nacimiento_Paciente, idPaciente, Cama_Paciente, Edad, Diag_Med_Nutri, Prescripcion, Desayuno, Col_Matutina, Comida, Col_Vespertina, Cena, Col_Nocturna, Observaciones, Control_Tamizaje, area, privados, Fecha_Hora_Creacion, Creado_por) 
+        VALUES ('', '$nombre', '$fechaNacimiento','$idPaciente', '$cama', '$edad', '$diagnosticoMed', '$prescripcionNutri', '', '', '$comida', '', '', '', '$observaciones', '$controlTamizaje', 'GINECOLOGÍA', '$vip', '$fechaHoraActual', '$usuario')";
+            mysqli_query($con, $sqlInsert);
+
+            $fechaHoy1 = date("Y-m-d");
+            $obtenerIdDieta = "SELECT * FROM dietas WHERE idPaciente = '$idPaciente' AND DATE(Fecha_Hora_Creacion) = '$fechaHoy1'";
+            $queryDietas = mysqli_query($con, $obtenerIdDieta);
+            $result = mysqli_fetch_assoc($queryDietas);
+            $idDieta = $result['ID'];
+
+            $insert = "INSERT INTO updatecomida (ID, idDieta, IdPaciente, fechaHora, Comida, area, modificadoPor) 
+            VALUES ('', '$idDieta', '$idPaciente', '$fechaHoraActual', '$comida', 'GINECOLOGÍA', '$usuario')";
+            mysqli_query($con, $insert);
+        } elseif ($rangoHoraActual == 'Col_Vespertina') {
+
+            $sqlInsert = "INSERT INTO dietas 
+               (ID, Nombre_Paciente, Fecha_Nacimiento_Paciente, idPaciente, Cama_Paciente, Edad, Diag_Med_Nutri, Prescripcion, Desayuno, Col_Matutina, Comida, Col_Vespertina, Cena, Col_Nocturna, Observaciones, Control_Tamizaje, area, privados, Fecha_Hora_Creacion, Creado_por) 
+        VALUES ('', '$nombre', '$fechaNacimiento','$idPaciente', '$cama', '$edad', '$diagnosticoMed', '$prescripcionNutri', '', '', '', '$colVespertina', '', '', '$observaciones', '$controlTamizaje', 'GINECOLOGÍA', '$vip', '$fechaHoraActual', '$usuario')";
+            mysqli_query($con, $sqlInsert);
+
+            $fechaHoy1 = date("Y-m-d");
+            $obtenerIdDieta = "SELECT * FROM dietas WHERE idPaciente = '$idPaciente' AND DATE(Fecha_Hora_Creacion) = '$fechaHoy1'";
+            $queryDietas = mysqli_query($con, $obtenerIdDieta);
+            $result = mysqli_fetch_assoc($queryDietas);
+            $idDieta = $result['ID'];
+
+            $insert = "INSERT INTO updatecol_vespertina (ID, idDieta, IdPaciente, fechaHora, Col_Vespertina, area, modificadoPor) 
+            VALUES ('', '$idDieta', '$idPaciente', '$fechaHoraActual', '$colVespertina', 'GINECOLOGÍA', '$usuario')";
+            mysqli_query($con, $insert);
+        } elseif ($rangoHoraActual == 'Cena') {
+
+            $sqlInsert = "INSERT INTO dietas 
+               (ID, Nombre_Paciente, Fecha_Nacimiento_Paciente, idPaciente, Cama_Paciente, Edad, Diag_Med_Nutri, Prescripcion, Desayuno, Col_Matutina, Comida, Col_Vespertina, Cena, Col_Nocturna, Observaciones, Control_Tamizaje, area, privados, Fecha_Hora_Creacion, Creado_por) 
+        VALUES ('', '$nombre', '$fechaNacimiento','$idPaciente', '$cama', '$edad', '$diagnosticoMed', '$prescripcionNutri', '', '', '', '', '$cena', '', '$observaciones', '$controlTamizaje', 'GINECOLOGÍA', '$vip', '$fechaHoraActual', '$usuario')";
+            mysqli_query($con, $sqlInsert);
+
+            $fechaHoy1 = date("Y-m-d");
+            $obtenerIdDieta = "SELECT * FROM dietas WHERE idPaciente = '$idPaciente' AND DATE(Fecha_Hora_Creacion) = '$fechaHoy1'";
+            $queryDietas = mysqli_query($con, $obtenerIdDieta);
+            $result = mysqli_fetch_assoc($queryDietas);
+            $idDieta = $result['ID'];
+
+            $insert = "INSERT INTO updatecena (ID, idDieta, IdPaciente, fechaHora, Cena, area, modificadoPor) 
+            VALUES ('', '$idDieta', '$idPaciente', '$fechaHoraActual', '$cena', 'GINECOLOGÍA', '$usuario')";
+            mysqli_query($con, $insert);
+        } elseif ($rangoHoraActual == 'Col_Nocturna') {
+            $sqlInsert = "INSERT INTO dietas 
+               (ID, Nombre_Paciente, Fecha_Nacimiento_Paciente, idPaciente, Cama_Paciente, Edad, Diag_Med_Nutri, Prescripcion, Desayuno, Col_Matutina, Comida, Col_Vespertina, Cena, Col_Nocturna, Observaciones, Control_Tamizaje, area, privados, Fecha_Hora_Creacion, Creado_por) 
+        VALUES ('', '$nombre', '$fechaNacimiento','$idPaciente', '$cama', '$edad', '$diagnosticoMed', '$prescripcionNutri', '', '', '', '', '', '$colNocturna', '$observaciones', '$controlTamizaje', 'GINECOLOGÍA', '$vip', '$fechaHoraActual', '$usuario')";
+            mysqli_query($con, $sqlInsert);
+
+            $fechaHoy1 = date("Y-m-d");
+            $obtenerIdDieta = "SELECT * FROM dietas WHERE idPaciente = '$idPaciente' AND DATE(Fecha_Hora_Creacion) = '$fechaHoy1'";
+            $queryDietas = mysqli_query($con, $obtenerIdDieta);
+            $result = mysqli_fetch_assoc($queryDietas);
+            $idDieta = $result['ID'];
+
+            $insert = "INSERT INTO updatecol_nocturna (ID, idDieta, IdPaciente, fechaHora, Col_Nocturna, area, modificadoPor) 
+            VALUES ('', '$idDieta', '$idPaciente', '$fechaHoraActual', '$colNocturna', 'GINECOLOGÍA', '$usuario')";
+            mysqli_query($con, $insert);
+        }
     }
 }
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+
+// Función de ejemplo para guardar datos de familiares
+function guardarOActualizarDietaFamiliar($idPacienteF, $datosFamiliar, $rangoHoraActual)
+{
+
+    global $con;
+    $fechaHoy = date("Y-m-d");
+    $fechaHoraActual = date("Y-m-d H:i:s");
+
+    $sql = "SELECT * FROM rnginecologia WHERE idPaciente = '$idPacienteF' AND DATE(fecha_solicitud) = '$fechaHoy'";
+    $query = mysqli_query($con, $sql);
+
+    $existe = mysqli_num_rows($query) > 0;
+    $result = $existe ? mysqli_fetch_assoc($query) : null;
+
+    $area = $result['area'] ?? null;
+    $idDieta = $result['ID'] ?? null;
+
+    $idFamiliar = $datosFamiliar['idPacienteF'];
+    $nombreF = $datosFamiliar['nombreFamiliar'];
+    $camaF = $datosFamiliar['camaF'];
+    $usuarioF = $datosFamiliar['usuarioF'];
+    $desayunoF = $datosFamiliar['DesayunoF'];
+    $colMatutinaF = $datosFamiliar['Col_MatutinaF'];
+    $comidaF = $datosFamiliar['ComidaF'];
+    $colVespertinaF = $datosFamiliar['Col_VespertinaF'];
+    $cenaF = $datosFamiliar['CenaF'];
+    $colNocturnaF = $datosFamiliar['Col_NocturnaF'];
+
+    if ($existe) {
+        // Dependiendo del rango de hora actual, realizar la consulta correspondiente
+        if ($rangoHoraActual == 'Desayuno') {
+            $fechaHoy1 = date("Y-m-d");
+            $obtenerIdDieta = "SELECT * FROM rnginecologia WHERE idPaciente = '$idFamiliar' AND DATE(fecha_solicitud) = '$fechaHoy1'";
+            $queryDietas = mysqli_query($con, $obtenerIdDieta);
+            $result = mysqli_fetch_assoc($queryDietas);
+            $idDieta = $result['id'];
+            $insert = "INSERT INTO updatedesayunos (ID, idDieta, idPaciente, fechaHora, Desayuno, area, modificadoPor)
+                        VALUES ('', '$idDieta', '$idFamiliar', '$fechaHoraActual', '$desayunoF', 'GINECOLOGÍA', '$usuarioF')";
+            mysqli_query($con, $insert);
+            $sqlUpdate = "UPDATE rnginecologia SET Desayuno = '$desayunoF', fecha_solicitud = '$fechaHoraActual', creado_por = '$usuarioF' WHERE idPaciente = '$idFamiliar' AND DATE(fecha_solicitud) = '$fechaHoy'";
+            mysqli_query($con, $sqlUpdate);
+        } elseif ($rangoHoraActual == 'Col_Matutina') {
+            // Realizar la consulta correspondiente a Col_Matutina
+            $fechaHoy1 = date("Y-m-d");
+            $obtenerIdDieta = "SELECT * FROM rnginecologia WHERE idPaciente = '$idFamiliar' AND DATE(fecha_solicitud) = '$fechaHoy1'";
+            $queryDietas = mysqli_query($con, $obtenerIdDieta);
+            $result = mysqli_fetch_assoc($queryDietas);
+            $idDieta = $result['id'];
+            $insert = "INSERT INTO updatecol_matutina (ID, idDieta, idPaciente, fechaHora, Col_Matutina, area, modificadoPor)
+                        VALUES ('', '$idDieta', '$idFamiliar', '$fechaHoraActual', '$colMatutinaF', 'GINECOLOGÍA', '$usuarioF')";
+            mysqli_query($con, $insert);
+            $sqlUpdate = "UPDATE rnginecologia SET Col_Matutina = '$colMatutinaF', fecha_solicitud = '$fechaHoraActual', creado_por = '$usuarioF' WHERE idPaciente = '$idFamiliar' AND DATE(fecha_solicitud) = '$fechaHoy'";
+            mysqli_query($con, $sqlUpdate);
+        } elseif ($rangoHoraActual == 'Comida') {
+            // Realizar la consulta correspondiente a Comida
+            $fechaHoy1 = date("Y-m-d");
+            $obtenerIdDieta = "SELECT * FROM rnginecologia WHERE idPaciente = '$idFamiliar' AND DATE(fecha_solicitud) = '$fechaHoy1'";
+            $queryDietas = mysqli_query($con, $obtenerIdDieta);
+            $result = mysqli_fetch_assoc($queryDietas);
+            $idDieta = $result['id'];
+            $insert = "INSERT INTO updatecomida (ID, idDieta, idPaciente, fechaHora, Comida, area, modificadoPor)
+                        VALUES ('', '$idDieta', '$idFamiliar', '$fechaHoraActual', '$comidaF', 'GINECOLOGÍA', '$usuarioF')";
+            mysqli_query($con, $insert);
+            $sqlUpdate = "UPDATE rnginecologia SET Comida = '$comidaF', fecha_solicitud = '$fechaHoraActual', creado_por = '$usuarioF' WHERE idPaciente = '$idFamiliar' AND DATE(fecha_solicitud) = '$fechaHoy'";
+            mysqli_query($con, $sqlUpdate);
+        } elseif ($rangoHoraActual == 'Col_Vespertina') {
+            // Realizar la consulta correspondiente a Col_Vespertina
+            $fechaHoy1 = date("Y-m-d");
+            $obtenerIdDieta = "SELECT * FROM rnginecologia WHERE idPaciente = '$idFamiliar' AND DATE(fecha_solicitud) = '$fechaHoy1'";
+            $queryDietas = mysqli_query($con, $obtenerIdDieta);
+            $result = mysqli_fetch_assoc($queryDietas);
+            $idDieta = $result['id'];
+            $insert = "INSERT INTO updatecol_vespertina (ID, idDieta, idPaciente, fechaHora, Col_Vespertina, area, modificadoPor)
+                        VALUES ('', '$idDieta', '$idFamiliar', '$fechaHoraActual', '$colVespertinaF', 'GINECOLOGÍA', '$usuarioF')";
+            mysqli_query($con, $insert);
+            $sqlUpdate = "UPDATE rnginecologia SET Col_Vespertina = '$colVespertinaF', fecha_solicitud = '$fechaHoraActual', creado_por = '$usuarioF' WHERE idPaciente = '$idFamiliar' AND DATE(fecha_solicitud) = '$fechaHoy'";
+            mysqli_query($con, $sqlUpdate);
+        } elseif ($rangoHoraActual == 'Cena') {
+            // Realizar la consulta correspondiente a Cena
+            $fechaHoy1 = date("Y-m-d");
+            $obtenerIdDieta = "SELECT * FROM rnginecologia WHERE idPaciente = '$idFamiliar' AND DATE(fecha_solicitud) = '$fechaHoy1'";
+            $queryDietas = mysqli_query($con, $obtenerIdDieta);
+            $result = mysqli_fetch_assoc($queryDietas);
+            $idDieta = $result['id'];
+            $insert = "INSERT INTO updatecena (ID, idDieta, idPaciente, fechaHora, cena, area, modificadoPor)
+                        VALUES ('', '$idDieta', '$idFamiliar', '$fechaHoraActual', '$cenaF', 'GINECOLOGÍA', '$usuarioF')";
+            mysqli_query($con, $insert);
+            $sqlUpdate = "UPDATE rnginecologia SET Cena = '$cenaF', fecha_solicitud = '$fechaHoraActual', creado_por = '$usuarioF' WHERE idPaciente = '$idFamiliar' AND DATE(fecha_solicitud) = '$fechaHoy'";
+            mysqli_query($con, $sqlUpdate);
+        } elseif ($rangoHoraActual == 'Col_Nocturna') {
+            // Realizar la consulta correspondiente a Col_Nocturna
+            $fechaHoy1 = date("Y-m-d");
+            $obtenerIdDieta = "SELECT * FROM rnginecologia WHERE idPaciente = '$idFamiliar' AND DATE(fecha_solicitud) = '$fechaHoy1'";
+            $queryDietas = mysqli_query($con, $obtenerIdDieta);
+            $result = mysqli_fetch_assoc($queryDietas);
+            $idDieta = $result['id'];
+            $insert = "INSERT INTO updatecol_nocturna (ID, idDieta, idPaciente, fechaHora, Col_Nocturna, area, modificadoPor)
+                        VALUES ('', '$idDieta', '$idFamiliar', '$fechaHoraActual', '$colNocturnaF', 'GINECOLOGÍA', '$usuarioF')";
+            mysqli_query($con, $insert);
+            $sqlUpdate = "UPDATE rnginecologia SET Col_Nocturna = '$colNocturnaF', fecha_solicitud = '$fechaHoraActual', creado_por = '$usuarioF' WHERE idPaciente = '$idFamiliar' AND DATE(fecha_solicitud) = '$fechaHoy'";
+            mysqli_query($con, $sqlUpdate);
+        }
+        //si no se encontro ningun registro
+    } else {
+        // Insertar un nuevo registro
+        $idFamiliar = $datosFamiliar['idPacienteF'];
+        $nombreF = $datosFamiliar['nombreFamiliar'];
+        $camaF = $datosFamiliar['camaF'];
+        $usuarioF = $datosFamiliar['usuarioF'];
+        $desayunoF = $datosFamiliar['DesayunoF'];
+        $colMatutinaF = $datosFamiliar['Col_MatutinaF'];
+        $comidaF = $datosFamiliar['ComidaF'];
+        $colVespertinaF = $datosFamiliar['Col_VespertinaF'];
+        $cenaF = $datosFamiliar['CenaF'];
+        $colNocturnaF = $datosFamiliar['Col_NocturnaF'];
+        $idPacienteOriginal = substr($idFamiliar, 4);
+
+        if ($rangoHoraActual == 'Desayuno') {
+
+
+            $fechaHoy1 = date("Y-m-d");
+            $obtenerIdDieta = "SELECT * FROM dietas WHERE idPaciente = '$idPacienteOriginal' AND DATE(Fecha_Hora_Creacion) = '$fechaHoy1'";
+            $queryDietas = mysqli_query($con, $obtenerIdDieta);
+            $result = mysqli_fetch_assoc($queryDietas);
+            $idDieta = $result['ID'];
+
+            $sqlInsert = "INSERT INTO rnginecologia 
+                (id, idDieta, idPaciente, cama, nombre, Desayuno, Col_Matutina, Comida, Col_Vespertina, Cena, Col_Nocturna, fecha_solicitud, Creado_por) 
+            VALUES ('', '$idDieta', '$idFamiliar','$camaF', '$nombreF', '$desayunoF', '', '', '', '', '', '$fechaHoraActual', '$usuarioF')";
+            mysqli_query($con, $sqlInsert);
+
+            $fechaHoy1 = date("Y-m-d");
+            $obtenerIdDieta = "SELECT * FROM rnginecologia WHERE idPaciente = '$idFamiliar' AND DATE(fecha_solicitud) = '$fechaHoy1'";
+            $queryDietas = mysqli_query($con, $obtenerIdDieta);
+            $result = mysqli_fetch_assoc($queryDietas);
+            $idDieta = $result['id'];
+
+            $insert = "INSERT INTO updatedesayunos (ID, idDieta, idPaciente, fechaHora, Desayuno, area, modificadoPor) 
+                        VALUES ('', '$idDieta', '$idFamiliar', '$fechaHoraActual', '$desayunoF', 'GINECOLOGÍA', '$usuarioF')";
+            mysqli_query($con, $insert);
+        } elseif ($rangoHoraActual == 'Col_Matutina') {
+
+            $fechaHoy1 = date("Y-m-d");
+            $obtenerIdDieta = "SELECT * FROM dietas WHERE idPaciente = '$idPacienteOriginal' AND DATE(Fecha_Hora_Creacion) = '$fechaHoy1'";
+            $queryDietas = mysqli_query($con, $obtenerIdDieta);
+            $result = mysqli_fetch_assoc($queryDietas);
+            $idDieta = $result['ID'];
+
+            $sqlInsert = "INSERT INTO rnginecologia 
+                (id, idDieta, idPaciente, cama, nombre, Desayuno, Col_Matutina, Comida, Col_Vespertina, Cena, Col_Nocturna, fecha_solicitud, Creado_por) 
+            VALUES ('', '$idDieta', '$idPacienteF','$camaF', '$nombreF', '', '$colMatutinaF', '', '', '', '', '$fechaHoraActual', '$usuarioF')";
+            mysqli_query($con, $sqlInsert);
+
+            $fechaHoy1 = date("Y-m-d");
+            $obtenerIdDieta = "SELECT * FROM rnginecologia WHERE idPaciente = '$idPacienteF' AND DATE(fecha_solicitud) = '$fechaHoy1'";
+            $queryDietas = mysqli_query($con, $obtenerIdDieta);
+            $result = mysqli_fetch_assoc($queryDietas);
+            $idDieta = $result['id'];
+
+            $insert = "INSERT INTO updatecol_matutina (ID, idDieta, idPaciente, fechaHora, Col_Matutina, area, modificadoPor) 
+                        VALUES ('', '$idDieta', '$idPacienteF', '$fechaHoraActual', '$colMatutinaF', 'GINECOLOGÍA', '$usuarioF')";
+            mysqli_query($con, $insert);
+        } elseif ($rangoHoraActual == 'Comida') {
+
+            $fechaHoy1 = date("Y-m-d");
+            $obtenerIdDieta = "SELECT * FROM dietas WHERE idPaciente = '$idPacienteOriginal' AND DATE(Fecha_Hora_Creacion) = '$fechaHoy1'";
+            $queryDietas = mysqli_query($con, $obtenerIdDieta);
+            $result = mysqli_fetch_assoc($queryDietas);
+            $idDieta = $result['ID'];
+
+            $sqlInsert = "INSERT INTO rnginecologia 
+                (id, idDieta, idPaciente, cama, nombre, Desayuno, Col_Matutina, Comida, Col_Vespertina, Cena, Col_Nocturna, fecha_solicitud, Creado_por) 
+            VALUES ('', '$idDieta', '$idPacienteF','$camaF', '$nombreF', '', '', '$comidaF', '', '', '', '$fechaHoraActual', '$usuarioF')";
+            mysqli_query($con, $sqlInsert);
+
+            $fechaHoy1 = date("Y-m-d");
+            $obtenerIdDieta = "SELECT * FROM rnginecologia WHERE idPaciente = '$idPacienteF' AND DATE(fecha_solicitud) = '$fechaHoy1'";
+            $queryDietas = mysqli_query($con, $obtenerIdDieta);
+            $result = mysqli_fetch_assoc($queryDietas);
+            $idDieta = $result['id'];
+
+            $insert = "INSERT INTO updatecomida (ID, idDieta, idPaciente, fechaHora, Comida, area, modificadoPor) 
+                        VALUES ('', '$idDieta', '$idPacienteF', '$fechaHoraActual', '$comidaF', 'GINECOLOGÍA', '$usuarioF')";
+            mysqli_query($con, $insert);
+        } elseif ($rangoHoraActual == 'Col_Vespertina') {
+
+            $fechaHoy1 = date("Y-m-d");
+            $obtenerIdDieta = "SELECT * FROM dietas WHERE idPaciente = '$idPacienteOriginal' AND DATE(Fecha_Hora_Creacion) = '$fechaHoy1'";
+            $queryDietas = mysqli_query($con, $obtenerIdDieta);
+            $result = mysqli_fetch_assoc($queryDietas);
+            $idDieta = $result['ID'];
+
+            $sqlInsert = "INSERT INTO rnginecologia 
+                (id, idDieta, idPaciente, cama, nombre, Desayuno, Col_Matutina, Comida, Col_Vespertina, Cena, Col_Nocturna, fecha_solicitud, Creado_por) 
+            VALUES ('', '$idDieta', '$idPacienteF','$camaF', '$nombreF', '', '', '', '$colVespertinaF', '', '', '$fechaHoraActual', '$usuarioF')";
+            mysqli_query($con, $sqlInsert);
+
+            $fechaHoy1 = date("Y-m-d");
+            $obtenerIdDieta = "SELECT * FROM rnginecologia WHERE idPaciente = '$idPacienteF' AND DATE(fecha_solicitud) = '$fechaHoy1'";
+            $queryDietas = mysqli_query($con, $obtenerIdDieta);
+            $result = mysqli_fetch_assoc($queryDietas);
+            $idDieta = $result['id'];
+            $dieta = $result['Col_Vespertina'];
+            $idRN = $result['idPaciente'];
+
+            $insert = "INSERT INTO updatecol_vespertina (ID, idDieta, idPaciente, fechaHora, Col_Vespertina, area, modificadoPor) 
+                        VALUES ('', '$idDieta', '$idRN', '$fechaHoraActual', '$dieta', 'GINECOLOGÍA', '$usuarioF')";
+            mysqli_query($con, $insert);
+        } elseif ($rangoHoraActual == 'Cena') {
+
+            $fechaHoy1 = date("Y-m-d");
+            $obtenerIdDieta = "SELECT * FROM dietas WHERE idPaciente = '$idPacienteOriginal' AND DATE(Fecha_Hora_Creacion) = '$fechaHoy1'";
+            $queryDietas = mysqli_query($con, $obtenerIdDieta);
+            $result = mysqli_fetch_assoc($queryDietas);
+            $idDieta = $result['ID'];
+
+            $sqlInsert = "INSERT INTO rnginecologia 
+                (id, idDieta, idPaciente, cama, nombre, Desayuno, Col_Matutina, Comida, Col_Vespertina, Cena, Col_Nocturna, fecha_solicitud, Creado_por) 
+            VALUES ('', '$idDieta', '$idPacienteF','$camaF', '$nombreF', '', '', '', '', '$cenaF', '', '$fechaHoraActual', '$usuarioF')";
+            mysqli_query($con, $sqlInsert);
+
+            $fechaHoy1 = date("Y-m-d");
+            $obtenerIdDieta = "SELECT * FROM rnginecologia WHERE idPaciente = '$idPacienteF' AND DATE(fecha_solicitud) = '$fechaHoy1'";
+            $queryDietas = mysqli_query($con, $obtenerIdDieta);
+            $result = mysqli_fetch_assoc($queryDietas);
+            $idDieta = $result['id'];
+
+            $insert = "INSERT INTO updatecena (ID, idDieta, idPaciente, fechaHora, cena, area, modificadoPor) 
+                        VALUES ('', '$idDieta', '$idPacienteF', '$fechaHoraActual', '$cenaF', 'GINECOLOGÍA', '$usuarioF')";
+            mysqli_query($con, $insert);
+        } elseif ($rangoHoraActual == 'Col_Nocturna') {
+            $fechaHoy1 = date("Y-m-d");
+            $obtenerIdDieta = "SELECT * FROM dietas WHERE idPaciente = '$idPacienteOriginal' AND DATE(Fecha_Hora_Creacion) = '$fechaHoy1'";
+            $queryDietas = mysqli_query($con, $obtenerIdDieta);
+            $result = mysqli_fetch_assoc($queryDietas);
+            $idDieta = $result['ID'];
+
+            $sqlInsert = "INSERT INTO rnginecologia 
+                (id, idDieta, idPaciente, cama, nombre, Desayuno, Col_Matutina, Comida, Col_Vespertina, Cena, Col_Nocturna, fecha_solicitud, Creado_por) 
+            VALUES ('', '$idDieta', '$idPacienteF','$camaF', '$nombreF', '', '', '', '', '', '$colNocturnaF', '$fechaHoraActual', '$usuarioF')";
+            mysqli_query($con, $sqlInsert);
+
+            $fechaHoy1 = date("Y-m-d");
+            $obtenerIdDieta = "SELECT * FROM rnginecologia WHERE idPaciente = '$idPacienteF' AND DATE(fecha_solicitud) = '$fechaHoy1'";
+            $queryDietas = mysqli_query($con, $obtenerIdDieta);
+            $result = mysqli_fetch_assoc($queryDietas);
+            $idDieta = $result['id'];
+
+            $insert = "INSERT INTO updatecol_nocturna (ID, idDieta, idPaciente, fechaHora, Col_Nocturna, area, modificadoPor) 
+                        VALUES ('', '$idDieta', '$idPacienteF', '$fechaHoraActual', '$colNocturnaF', 'GINECOLOGÍA', '$usuarioF')";
+            mysqli_query($con, $insert);
+        }
+    }
+}
+
+/*if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $idPaciente = $_POST['idPaciente'];
     $datos = json_decode($_POST['datos'], true); // Decodificar JSON a array
 
@@ -144,9 +534,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     guardarOActualizarDieta($idPaciente, $datos, $rangoHoraActual);
     exit;
-}
+}*/
 
-
+$fechaHoraActual1 = date("Y-m-d");
 $sql = "SELECT p.*, d.*, p.idPaciente AS pacienteID, d.idPaciente AS dietaID, p.cama
 FROM pacientes p
 LEFT JOIN (
@@ -155,7 +545,7 @@ LEFT JOIN (
  INNER JOIN (
  SELECT MAX(ID) AS ID, idPaciente
  FROM dietas
- WHERE area = 'GINECOLOGÍA'
+ WHERE area = 'GINECOLOGÍA' AND DATE(Fecha_Hora_Creacion) = '$fechaHoraActual1'
  GROUP BY idPaciente
  ) d2 ON d1.ID = d2.ID
 ) d ON p.idPaciente = d.idPaciente
@@ -239,11 +629,11 @@ if ($query->num_rows > 0) {
     <div class="d-flex h-100">
         <?php include 'sidebar.php'; ?>
 
-        <!-- ========== MAIN CONTENT ========== -->
+        <!-- ========== MAIN CONTENT ========== flex-grow-1-->
         <main class="main-content d-flex flex-column vh-100">
 
             <div class="encabezado-fijo bg-white border-bottom px-4 pt-3 pb-2" style="position: sticky; top: 0; z-index: 10;">
-                
+
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
                     <h3 class="h3">SOLICITUD DE ORDEN GINECOLOGÍA</h3>
                     <div class="btn-toolbar mb-2 mb-md-0">
@@ -289,7 +679,8 @@ if ($query->num_rows > 0) {
                     <div class="mx-auto col-md-12 col-lg-12 ">
                         <h1 class="mb-3"></h1>
                         <div class="row g-3">
-                            <div class="table-responsive" style="max-height: 830px; overflow-y: auto;">
+                            <div id="contenedorScroll" class="table-responsive" style="max-height: 830px; overflow-y: auto;">
+                                <!--<div id="contenedorScroll" class="table-responsive flex-grow-1" style=" overflow-y: auto;">-->
                                 <table id="miTabla" class="table table-light table-sm table-striped table-bordered">
                                     <thead>
                                         <tr style="border: none;">
@@ -339,10 +730,54 @@ if ($query->num_rows > 0) {
                                             <th class="text-center" scope="col" hidden>Fecha_Hora_Solicitud</th>
                                         </tr>
                                     </thead>
+
+                                    <?php
+                                    include 'conexion.php';
+                                    date_default_timezone_set('America/Mexico_City');
+                                    $fechaHoy = date("Y-m-d");
+                                    $familiaresConRegistro = [];
+
+                                    foreach ($datosCombinados as $dataRow) {
+                                        $numeroPaciente = str_replace('RN-', '', $dataRow["pacienteID"]);
+
+                                        $sql = "SELECT 1 FROM rnginecologia 
+            WHERE idPaciente LIKE 'RN%-$numeroPaciente' 
+            AND DATE(fecha_solicitud) = '$fechaHoy' 
+            LIMIT 1";
+
+                                        $result = mysqli_query($con, $sql);
+
+                                        if ($result && mysqli_num_rows($result) > 0) {
+                                            $familiaresConRegistro[$dataRow["pacienteID"]] = true;
+                                        }
+                                    }
+                                    ?>
+
                                     <tbody>
-                                        <?php foreach ($datosCombinados as $dataRow) { ?>
+                                        <?php foreach ($datosCombinados as $dataRow) {
+
+                                            $pacienteID = $dataRow["pacienteID"];
+                                            $mostrarIconoFamiliar = isset($familiaresConRegistro[$pacienteID]);
+                                        ?>
                                             <tr>
-                                                <td scope="col"><input type="checkbox" onclick="toggleEdit(this)"></td>
+                                                <td scope="col">
+                                                    <input type="checkbox" class="form-check-input custom-checkbox" style="width: 20px; height: 20px;" onclick="toggleEdit(this)">
+                                                    <svg class="icon-add d-none bi bi-plus-circle-fill" data-id="<?php echo $dataRow["pacienteID"]; ?>" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                                                        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M8.5 4.5a.5.5 0 0 0-1 0v3h-3a.5.5 0 0 0 0 1h3v3a.5.5 0 0 0 1 0v-3h3a.5.5 0 0 0 0-1h-3z" />
+                                                    </svg>
+                                                    <svg class="icon-remove d-none bi bi-dash-circle-fill" data-id="<?php echo $dataRow["pacienteID"]; ?>" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                                                        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M4.5 7.5a.5.5 0 0 0 0 1h7a.5.5 0 0 0 0-1z" />
+                                                    </svg>
+
+                                                    <!-- Icono si ya existe registro del familiar -->
+                                                    <?php if ($mostrarIconoFamiliar): ?>
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="green" class="bi bi-person-fill-check mt-1" viewBox="0 0 16 16">
+                                                            <path d="M12.5 16a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7m1.679-4.493-1.335 2.226a.75.75 0 0 1-1.174.144l-.774-.773a.5.5 0 0 1 .708-.708l.547.548 1.17-1.951a.5.5 0 1 1 .858.514M11 5a3 3 0 1 1-6 0 3 3 0 0 1 6 0" />
+                                                            <path d="M2 13c0 1 1 1 1 1h5.256A4.5 4.5 0 0 1 8 12.5a4.5 4.5 0 0 1 1.544-3.393Q8.844 9.002 8 9c-5 0-6 3-6 4" />
+                                                        </svg>
+                                                    <?php endif; ?>
+
+                                                </td>
                                                 <td class="text-center" data-campo="nombre"><?php echo $dataRow["nombre"]; ?></td>
                                                 <td class="text-center" data-campo="fechaNacimiento"><?php echo $dataRow["fechaNacimiento"]; ?></td>
                                                 <td class="text-center" data-campo="idPaciente"><?php echo $dataRow["pacienteID"]; ?></td>
@@ -391,7 +826,7 @@ if ($query->num_rows > 0) {
 
                                 <div class="form-group col-md-9">
                                     <label class="fs-4">Nombre del Paciente</label>
-                                    <input type="text" class="form-control fs-4" id="nombrePaciente" name="nombrePaciente" required>
+                                    <input type="text" class="form-control fs-4" id="nombrePaciente" name="nombrePaciente" style="text-transform: uppercase;" required>
                                 </div>
 
                                 <div class="form-group col-md-9">
@@ -408,15 +843,32 @@ if ($query->num_rows > 0) {
                                     <label class="fs-5">Cama</label>
                                     <select name="cama" id="cama" class="form-control fs-5" required>
                                         <?php
-                                        $sqlCama = "SELECT numero FROM camas WHERE area = 'GINECOLOGÍA'";
+                                        $sqlCama = "
+            SELECT numero 
+            FROM camas 
+            WHERE area = 'GINECOLOGÍA' 
+            AND numero NOT IN (
+                SELECT cama 
+                FROM pacientes 
+                WHERE area = 'GINECOLOGÍA' 
+                AND statusP = 'Activo'
+            )
+        ";
                                         $queryCama = mysqli_query($con, $sqlCama);
+                                        $hayCamas = mysqli_num_rows($queryCama) > 0;
 
-                                        while ($row = mysqli_fetch_assoc($queryCama)) {
-                                            echo '<option value="' . $row['numero'] . '">' . $row['numero'] . '</option>';
+                                        if ($hayCamas) {
+                                            echo '<option value="">Seleccione una cama</option>';
+                                            while ($row = mysqli_fetch_assoc($queryCama)) {
+                                                echo '<option value="' . $row['numero'] . '">' . $row['numero'] . '</option>';
+                                            }
+                                        } else {
+                                            echo '<option value="">No hay camas disponibles</option>';
                                         }
                                         ?>
                                     </select>
                                 </div>
+
 
                                 <div class="form-group col-md-9">
                                     <label for="edadAnios" class="fs-5">Años</label>
@@ -431,12 +883,12 @@ if ($query->num_rows > 0) {
 
                                 <div class="form-group col-md-9">
                                     <label class="fs-5">Diagnostico Médico y Nutricional</label>
-                                    <textarea class="form-control fs-5" aria-label="With textarea" id="diagMed" required></textarea>
+                                    <textarea class="form-control fs-5" aria-label="With textarea" id="diagMed" style="text-transform: uppercase;" required></textarea>
                                 </div>
 
                                 <div class="form-group col-md-9">
                                     <label class="fs-5">Prescripción Nutricional</label>
-                                    <textarea class="form-control fs-5" aria-label="With textarea" id="presNutri" required></textarea>
+                                    <textarea class="form-control fs-5" aria-label="With textarea" id="presNutri" style="text-transform: uppercase;" required></textarea>
                                 </div>
 
                                 <div class="form-group col-md-9">
@@ -450,12 +902,12 @@ if ($query->num_rows > 0) {
 
                                 <div class="form-group col-md-9">
                                     <label class="fs-5">Observaciones</label>
-                                    <textarea class="form-control fs-5" aria-label="With textarea" id="observaciones" required></textarea>
+                                    <textarea class="form-control fs-5" aria-label="With textarea" id="observaciones" style="text-transform: uppercase;" required></textarea>
                                 </div>
 
                                 <div class="form-group col-md-9">
                                     <label class="fs-5">Control de Tamizaje</label>
-                                    <textarea class="form-control fs-5" aria-label="With textarea" id="controlTami" required></textarea>
+                                    <textarea class="form-control fs-5" aria-label="With textarea" id="controlTami" style="text-transform: uppercase;" required></textarea>
                                 </div>
 
                                 <div class="form-group col-md-9" hidden>
@@ -509,7 +961,6 @@ if ($query->num_rows > 0) {
     <script src="js/sidebars.js"></script>
     <script src="js/relojG.js"></script>
     <script src="js/seguridad.js"></script>
-
 
     <?php include 'footer.php'; ?>
 </body>

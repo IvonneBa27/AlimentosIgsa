@@ -36,11 +36,13 @@ $page = isset($_GET['page']) ? $_GET['page'] : 1;
 $start_from = ($page - 1) * $results_per_page;
 
 // Modificar la consulta para limitar los resultados
-/*$consulta = "SELECT * FROM dietas WHERE area = 'CIRUGÍA GENERAL' AND DATE (Fecha_Hora_Creacion) = '$fechaFiltro' 
-ORDER BY ID DESC LIMIT $start_from, $results_per_page";*/
-$consulta = "SELECT * FROM dietas p 
-WHERE area = 'CIRUGÍA GENERAL' 
-  AND DATE(Fecha_Hora_Creacion) = '$fechaFiltro' 
+
+$consulta = "SELECT p.* 
+FROM dietas p
+JOIN pacientes pa ON p.idPaciente = pa.idPaciente
+WHERE p.area = 'CIRUGÍA GENERAL' 
+  AND DATE(p.Fecha_Hora_Creacion) = '$fechaFiltro'
+  AND pa.statusP = 'Activo'
 ORDER BY 
   CASE 
     WHEN p.Cama_Paciente LIKE 'A-%' THEN 1
@@ -52,19 +54,14 @@ ORDER BY
       ELSE p.Cama_Paciente
     END AS UNSIGNED
   )
-LIMIT $start_from, $results_per_page";
+LIMIT $start_from, $results_per_page;";
 
 
 $query = mysqli_query($con, $consulta);
 
 
-
-
-$pacientes = "SELECT * FROM pacientes WHERE area = 'CIRUGÍA GENERAL'";
+$pacientes = "SELECT * FROM pacientes WHERE area = 'CIRUGÍA GENERAL' AND statusP = 'Activo'";
 $ejecutar = mysqli_query($con, $pacientes);
-
-
-
 
 ?>
 
@@ -75,7 +72,7 @@ $ejecutar = mysqli_query($con, $pacientes);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> A D M I N I S T R A C I Ó N  &nbsp; &nbsp; D I E T A S </title>
+    <title> A D M I N I S T R A C I Ó N &nbsp; &nbsp; D I E T A S </title>
     <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
     <script src="js/color-modes.js"></script>
     <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
@@ -131,7 +128,7 @@ $ejecutar = mysqli_query($con, $pacientes);
                 </div>
             </div>
 
-            <canvas class="my-4 w-100" id="myChart" width="900" height="200"></canvas>
+            <canvas class="my-4 w-100" id="myChart" width="900" height="120"></canvas>
 
             <h4>Dietas Solicitadas</h4>
             <div class="pagination">
@@ -203,7 +200,6 @@ $ejecutar = mysqli_query($con, $pacientes);
                                 <?php } ?>
 
                                 <?php
-                                //$nota = "SELECT * FROM notas WHERE idDieta = '" . $dataRow['ID'] . "'";
                                 $nota = "SELECT * FROM notas WHERE idDieta = '" . $dataRow['ID'] . "' AND DATE(Fecha_Creacion) = '$fechaHoraActual'";
                                 $queryNota = mysqli_query($con, $nota);
                                 $notaExists = mysqli_num_rows($queryNota) > 0;
@@ -211,11 +207,10 @@ $ejecutar = mysqli_query($con, $pacientes);
                                 <td>
                                     <?php if ($notaExists) { ?>
                                         <button type="button" class="btn btn-primary" data-id="<?php echo $dataRow["ID"]; ?>" data-target="#myModal" data-toggle="modal">Ver Notas</button>
-                                    <?php } //elseif ($fechaFiltro == $creationDate) { 
+                                    <?php }
                                     ?>
-                                    <!-- <button type="button" class="btn btn-primary" data-id="<?php //echo $dataRow["ID"]; 
-                                                                                                ?>" data-target="#myModal" data-toggle="modal">Ver Notas</button>-->
-                                    <?php //} 
+
+                                    <?php
                                     ?>
                                 </td>
                             </tr>
@@ -337,14 +332,7 @@ $ejecutar = mysqli_query($con, $pacientes);
 
 
 
-
-
-
-
-
-
-
-    </main>
+        </main>
     </div>
 
 
@@ -356,6 +344,7 @@ $ejecutar = mysqli_query($con, $pacientes);
     <script type="text/javascript" src="node_modules/jquery/dist/jquery.min.js"></script>
     <script src="js/nota.js"></script>
     <script src="js/impresionCG.js"></script>
+    <script src="js/seguridad.js"></script>
 
     <?php include 'footer.php'; ?>
 

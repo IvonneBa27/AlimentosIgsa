@@ -110,7 +110,7 @@ $query = mysqli_query($con, $consulta);
                 </div>
             </div>
 
-            <canvas class="my-4 w-100" id="myChart" width="900" height="200"></canvas>
+            <canvas class="my-4 w-100" id="myChart" width="900" height="150"></canvas>
 
             <h4>Dietas Solicitadas</h4>
             <div class="pagination">
