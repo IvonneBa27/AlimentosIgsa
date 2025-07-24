@@ -67,7 +67,7 @@ $salas = $stmtSalas->fetchAll(PDO::FETCH_ASSOC);
         <main class="main-content">
 
             <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                <h3 class="h2">SERVICIO DE CAFÉ</h3>
+                <h3 class="h2">SERVICIO DE CATERING</h3>
                 <div class="btn-toolbar mb-2 mb-md-0">
 
                     <form action="">
@@ -102,7 +102,7 @@ $salas = $stmtSalas->fetchAll(PDO::FETCH_ASSOC);
 
 
             <div class="card">
-                <div class="card-header bg-dark text-white">Servicio de café</div>
+                <div class="card-header bg-dark text-white">Servicio de Catering</div>
                 <div class="card-body">
                     <table class="table table-striped" id="registros-table">
                         <thead class="thead-dark">
@@ -168,6 +168,10 @@ $salas = $stmtSalas->fetchAll(PDO::FETCH_ASSOC);
                                 <div class="mb-3">
                                     <label for="cantidad" class="form-label">Cantidad</label>
                                     <input type="number" class="form-control" id="cantidad" name="cantidad" min="1" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="cantidad" class="form-label">Descripción</label>
+                                    <input type="text" class="form-control" id="descripcion" name="descripcion" required>
                                 </div>
                                 <input type="hidden" id="codigoBarras">
                             </form>

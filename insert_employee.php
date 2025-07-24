@@ -180,7 +180,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                 $mail->setFrom('apps-zumpango@igsamedical.com', 'SISTEMA CONTROL DE ALIMENTOS');
                 $mail->addAddress($correo);
-
+                $mail->CharSet = 'UTF-8';
+                $mail->Encoding = 'base64';
                 $mail->isHTML(true);
                 $mail->Subject = 'Registro exitoso - Sistema Control de Alimentos';
                 $mail->Body = "

@@ -121,10 +121,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt = $con->prepare($sql);
 
     if ($stmt) {
-        $stmt->bind_param("ssssissssssiiiii",
-            $a_paterno, $a_materno, $nombre, $nombre_completo, $num_empleado,
-            $empresaId, $departamento, $puesto, $correo, $imagePath, $barcode_path,
-            $t_desayuno, $t_colacion, $t_comida, $t_cena, $id
+        $stmt->bind_param(
+            "ssssissssssiiiii",
+            $a_paterno,
+            $a_materno,
+            $nombre,
+            $nombre_completo,
+            $num_empleado,
+            $empresaId,
+            $departamento,
+            $puesto,
+            $correo,
+            $imagePath,
+            $barcode_path,
+            $t_desayuno,
+            $t_colacion,
+            $t_comida,
+            $t_cena,
+            $id
         );
 
         if ($stmt->execute()) {
@@ -142,6 +156,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     $mail->setFrom('apps-zumpango@igsamedical.com', 'SISTEMA CONTROL DE ALIMENTOS');
                     $mail->addAddress($correo);
                     $mail->isHTML(true);
+                    $mail->CharSet = 'UTF-8';
+                    $mail->Encoding = 'base64';
                     $mail->Subject = 'Registro exitoso - Sistema Control de Alimentos';
                     $mail->Body = "<h1>Bienvenido al Sistema de Comedor</h1>
                         <p>Estimado(a) $nombre_completo,</p>

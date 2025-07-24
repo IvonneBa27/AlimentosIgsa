@@ -161,6 +161,12 @@ $tipoPagos = $stmtTipoPagos->fetchAll(PDO::FETCH_ASSOC);
                                         <?php endforeach; ?>
                                     </select>
                                 </div>
+                                <!-- Campo solo visible si es efectivo -->
+                                <div class="mb-3 d-none" id="campoEfectivo">
+                                    <label for="pago_con" class="form-label">Pago con</label>
+                                    <input type="number" class="form-control" id="pago_con" name="pago_con" step="0.01">
+                                    <div id="cambioMostrado" class="form-text text-success mt-1"></div>
+                                </div>
 
 
                                 <input type="hidden" id="codigoBarras">
@@ -233,7 +239,7 @@ $tipoPagos = $stmtTipoPagos->fetchAll(PDO::FETCH_ASSOC);
 
 
 
-    
+
             <!-- Incluye estas líneas una sola vez en tu HTML, antes de tu script principal -->
             <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
             <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -259,6 +265,45 @@ $tipoPagos = $stmtTipoPagos->fetchAll(PDO::FETCH_ASSOC);
                             }, 1000);
                         }
                     });
+
+                            // Mostrar campo de pago solo si es efectivo
+                    $('#tipo_pago').on('change', function() {
+                        const tipoTexto = $(this).find('option:selected').text().toUpperCase();
+                        const esEfectivo = tipoTexto === 'EFECTIVO';
+
+                        if (esEfectivo) {
+                            $('#pago_con').closest('.mb-3').removeClass('d-none');
+                        } else {
+                            $('#pago_con').closest('.mb-3').addClass('d-none');
+                            $('#pago_con').val('');
+                            $('#cambioMostrado').remove(); // eliminar si existe
+                        }
+                    });
+
+                    
+                    // Calcular cambio automáticamente
+                    $('#pago_con, #cantidad').on('input', function() {
+                        const cantidad = parseInt($('#cantidad').val()) || 0;
+                        const pagoCon = parseFloat($('#pago_con').val()) || 0;
+                        const costoUnitario = 75; // puedes ajustar este valor desde backend si lo prefieres
+
+                        const total = cantidad * costoUnitario;
+                        const cambio = pagoCon - total;
+
+                        // Muestra el cambio en tiempo real
+                        if (!$('#cambioMostrado').length) {
+                            $('#pago_con').after('<small id="cambioMostrado" class="text-success mt-1 d-block"></small>');
+                        }
+
+                        if (!isNaN(cambio) && cambio >= 0) {
+                            $('#cambioMostrado').text(`Cambio: $${cambio.toFixed(2)}`);
+                        } else {
+                            $('#cambioMostrado').text('');
+                        }
+                    });
+
+
+
 
                     // ▶︎ Confirmar registro vía AJAX y mostrar modal SweetAlert2
                     $('#confirmarRegistro').click(function(e) {

@@ -864,11 +864,15 @@ $departamentos = $stmtDepartamentos->fetchAll(PDO::FETCH_ASSOC);
 
 
 
-            // Si existe una imagen, mostrarla en el modal
+            // Si existe una imagen, mostrarla; si no, ocultar la imagen
             if (image) {
-                $('#image-edit').attr('src', image);
-                $('#imageData').val(image); // Asignar la imagen (base64 o URL) al campo oculto
+                $('#image-edit').attr('src', image).show();
+                $('#imageData').val(image); // Si estás usando base64 u otro formato
+            } else {
+                $('#image-edit').removeAttr('src').hide(); // Oculta la imagen anterior
+                $('#imageData').val(''); // Limpia el input oculto también
             }
+
         });
 
 

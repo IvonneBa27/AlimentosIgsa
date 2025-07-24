@@ -61,6 +61,8 @@ try {
     $mail->setFrom('apps-zumpango@igsamedical.com', 'SISTEMA CONTROL DE ALIMENTOS');
     $mail->addAddress($correo);
     $mail->isHTML(true);
+    $mail->CharSet = 'UTF-8';
+    $mail->Encoding = 'base64';
     $mail->Subject = 'Codigo de Barras  - Sistema de Comedor';
     $mail->Body = "
         <p>Estimado(a)</p>
@@ -68,8 +70,8 @@ try {
          <p>Consulta nuestro <a href='https://igsa1-my.sharepoint.com/:b:/g/personal/apps-zumpango_igsamedical_com/EfmeKXrrAxFEoyMPPyIunVgBZ-2YdTVkg1WYTWzuxg22mA?e=ho0DsW' target='_blank'>Aviso de Privacidad</a>.</p>
     <br>
         <p>Gracias por usar el sistema de control de alimentos.</p>";
-    
-        $mail->addAttachment($barcodePath);
+
+    $mail->addAttachment($barcodePath);
 
     $mail->send();
 

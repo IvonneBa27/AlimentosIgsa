@@ -1,6 +1,15 @@
 <?php
 
 include 'db_connection.php';
+session_start();
+
+if (!isset($_SESSION['resultado'])) {
+    header('Location: index.html');
+    exit;
+}
+
+$sesi = $_SESSION['resultado'];
+$sesionUsuarioId = $sesi['id'];
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     try {
@@ -17,6 +26,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $sala = isset($_POST['sala_id']) ? (int)$_POST['sala_id'] : null;
         $solicitante = isset($_POST['solicitante']) ? trim($_POST['solicitante']) : null;
         $cantidad = isset($_POST['cantidad']) ? (int)$_POST['cantidad'] : null;
+        $descripcion = isset($_POST['descripcion']) ? trim($_POST['descripcion']) : null;
 
         if (!$barcode || !$empresa || !$departamento || !$sala || !$solicitante || !$cantidad) {
             throw new Exception("Todos los campos son obligatorios.");
@@ -31,7 +41,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $sql_producto = "SELECT id, producto, costo, barcode 
                             FROM producto 
                             WHERE barcode = :barcode 
-                            OR producto  LIKE '%SERVICIO DE CAFE%'
+                            OR producto  LIKE '%SERVICIO DE CATERING%'
                             AND estatus = 1";
         $stmt_producto = $conn->prepare($sql_producto);
         $stmt_producto->bindParam(':barcode', $barcode);
@@ -44,8 +54,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         // Insertar cortesía en la BD
         $sql_cortesia = "
-            INSERT INTO control_cafeteria (barcode, empresa_id, departamento_id, sala_id, solicitante, cantidad, fecha_registro, estatus_id)
-            VALUES (:barcode, :empresa_id, :departamento_id, :sala_id, :solicitante, :cantidad, NOW(), 1)
+            INSERT INTO control_cafeteria (barcode, empresa_id, departamento_id, sala_id, solicitante, cantidad, fecha_registro, estatus_id, user_id, descripcion)
+            VALUES (:barcode, :empresa_id, :departamento_id, :sala_id, :solicitante, :cantidad, NOW(), 1, :user_id, :descripcion)
         ";
         $stmt_cortesia = $conn->prepare($sql_cortesia);
         $stmt_cortesia->bindParam(':barcode', $producto['barcode']);
@@ -54,6 +64,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt_cortesia->bindParam(':sala_id', $sala);
         $stmt_cortesia->bindParam(':solicitante', $solicitante);
         $stmt_cortesia->bindParam(':cantidad', $cantidad);
+        $stmt_cortesia->bindParam(':user_id', $sesionUsuarioId);
+        $stmt_cortesia->bindParam(':descripcion', $descripcion);
         $stmt_cortesia->execute();
 
         // Obtener registros del día tras la inserción
@@ -80,7 +92,7 @@ function obtenerRegistrosDia($conn, $returnData = false)
     $sql = "
         SELECT 
             caf.id,
-            'SERVICIO DE CAFE' AS barcode,
+            'SERVICIO DE CATERING' AS barcode,
             em.nombre AS nombre_empresa,
             de.nombre AS nombre_departamento,
             sc.nombre AS nombre_sala,
