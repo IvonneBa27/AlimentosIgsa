@@ -32,6 +32,8 @@ $sesionNombre = $sesi['nombre'];   // Reemplaza con el nombre exacto de la colum
     <script src="js/color-modes.js"></script>
     <link rel="stylesheet" href="node_modules/bootstrap-icons/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qz-tray/2.1.0/qz-tray.js"></script>
+
 
 
 
@@ -81,7 +83,7 @@ $sesionNombre = $sesi['nombre'];   // Reemplaza con el nombre exacto de la colum
                     <form id="barcode-form">
                         <div class="form-group">
                             <label for="codigo_barras">Código de Barras</label>
-                            <input type="text" id="barcodeInput" placeholder="Escanea el código de barras" class="form-control" autofocus autocomplete="off">
+                            <input type="text" id="barcodeInput" placeholder="Escanea el código de barras" class="form-control" autocomplete="off" autofocus>
                         </div>
                         <!--<button type="submit" class="btn btn-primary">Registrar</button>-->
                     </form>
@@ -129,7 +131,7 @@ $sesionNombre = $sesi['nombre'];   // Reemplaza con el nombre exacto de la colum
                         </div>
                         <div class="modal-footer">
                             <form action="delete_control_food.php" method="POST">
-                                <input type="hidden" name="id" id="id">
+                                <input type="hidden" name="id" id="delete-comensal-id">
                                 <button type="submit" class="btn btn-danger">Sí, confirmar</button>
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                             </form>
@@ -172,6 +174,13 @@ $sesionNombre = $sesi['nombre'];   // Reemplaza con el nombre exacto de la colum
             <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
             <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
             <script>
+                //Cancelacion de producto.
+                $(document).on('click', '.btn-cancelar-servicio', function() {
+                    var id = $(this).data('id');
+                    $('#delete-comensal-id').val(id);
+                });
+
+
                 $(document).ready(function() {
                     function cargarRegistros() {
                         $('#spinner').show();
@@ -184,26 +193,30 @@ $sesionNombre = $sesi['nombre'];   // Reemplaza con el nombre exacto de la colum
                                 const tbody = $('#registros-table tbody');
                                 tbody.empty();
                                 res.data.registros_dia.forEach((registro) => {
-                                    let estatusHTML = `<span class="badge badge-secondary">${registro.estatus}</span>`;
-                                    if (registro.estatus === 'ACTIVO') estatusHTML = '<span class="badge badge-success">ACTIVO</span>';
-                                    if (registro.estatus === 'CANCELADO') estatusHTML = '<span class="badge badge-danger">CANCELADO</span>';
+                                    let estatusHTML = `<span class="badge bg-secondary">${registro.estatus}</span>`;
+                                    if (registro.estatus === 'ACTIVO') estatusHTML = '<span class="badge bg-success">ACTIVO</span>';
+                                    if (registro.estatus === 'CANCELADO') estatusHTML = '<span class="badge bg-danger">CANCELADO</span>';
 
                                     tbody.append(`
-            <tr>
-                <td>${registro.id}</td>
-                <td>${registro.num_empleado}</td>
-                <td>${registro.nombre_completo}</td>
-                <td>${registro.tipo_producto}</td>
-                <td>${registro.cantidad}</td>
-                <td>${registro.fecha_registro}</td>
-                <td>${estatusHTML}</td>
-                <td class="actions">
-                    <a href="#" data-id="${registro.id}" data-bs-toggle="modal" data-bs-target="#deleteComensalModal" onclick="setUserId(${registro.id})">
-                        <i class="fas fa-trash-alt"></i>
-                    </a>
-                </td>
-            </tr>
-        `);
+                                    <tr>
+                                        <td>${registro.id}</td>
+                                        <td>${registro.num_empleado}</td>
+                                        <td>${registro.nombre_completo}</td>
+                                        <td>${registro.tipo_producto}</td>
+                                        <td>${registro.cantidad}</td>
+                                        <td>${registro.fecha_registro}</td>
+                                        <td>${estatusHTML}</td>
+                                            <td>
+                                                            <button 
+                                                                class="btn btn-dark btn-sm btn-cancelar-servicio" 
+                                                                data-id="${registro.id}" 
+                                                                data-bs-toggle="modal" 
+                                                                data-bs-target="#deleteComensalModal">
+                                                                Cancelar
+                                                            </button>
+                                                        </td>
+                                    </tr>
+                                `);
                                 });
                             } else {
                                 mostrarError(res.message);
@@ -278,12 +291,18 @@ $sesionNombre = $sesi['nombre'];   // Reemplaza con el nombre exacto de la colum
 
                         setTimeout(() => {
                             infoModal.hide();
-                            imprimirTicket(data); // Imprimir etiqueta automáticamente
+                            imprimirTicket(data);
+
+                            // Después de imprimir, restablecer el foco en el input
+                            setTimeout(() => {
+                                $('#barcodeInput').focus();
+                            }, 100); // Ajusta el tiempo si es necesario
                         }, 2000);
                     }
 
                     function imprimirTicket(data) {//HKA80
                         const ticketContent = `
+<<<<<<< HEAD
                                 <!DOCTYPE html>
                                 <html>
                                 <head>
@@ -334,6 +353,58 @@ $sesionNombre = $sesi['nombre'];   // Reemplaza con el nombre exacto de la colum
                                 </body>
                                 </html>
                             `;
+=======
+                                              <!DOCTYPE html>
+                                              <html>
+                                              <head>
+                                                  <title>Ticket</title>
+                                                  <style>
+                                                      html, body {
+                                                          margin: 0 !important;
+                                                          padding: 0 !important;
+                                                          font-family: Arial, sans-serif;
+                                                          font-size: 13px;
+                                                          width: 80mm;
+                                                          text-align: center;
+                                                          line-height: 1.2;
+                                                      }
+
+                                                      @media print {
+                                                          @page {
+                                                              size: 80mm auto;
+                                                              margin: 0;
+                                                          }
+                                                          html, body {
+                                                              margin: 0 !important;
+                                                              padding: 0 !important;
+                                                          }
+                                                      }
+
+                                                      .ticket {
+                                                          margin: 0;
+                                                          padding: 0;
+                                                      }
+
+                                                      p {
+                                                          margin: 0;
+                                                          padding: 2px 0;
+                                                          font-size: 13px;
+                                                      }
+                                                  </style>
+                                              </head>
+                                              <body>
+                                                  <div class="ticket">
+                                                      <p><strong>Número de empleado:</strong> ${data.num_empleado}</p>
+                                                      <p><strong>Nombre:</strong> ${data.nombre_completo}</p>
+                                                      <p><strong>Empresa:</strong> ${data.empresa}</p>
+                                                      <p><strong>Descripción:</strong> ${data.tipo_producto}</p>
+                                                      <p><strong>Cantidad:</strong> ${data.cantidad}</p>
+                                                      <p><strong>Fecha de registro:</strong> ${data.fecha_registro}</p>
+                                                  </div>
+                                              </body>
+                                              </html>
+                                          `;
+>>>>>>> dev_IvonneAlimentos_120525
 
                         const printWindow = window.open('', 'PRINT', 'width=400,height=600');
                         printWindow.document.write(ticketContent);
@@ -383,17 +454,6 @@ $sesionNombre = $sesi['nombre'];   // Reemplaza con el nombre exacto de la colum
 
 
 
-
-
-
-                    // Detectar escaneo de código de barras cuando llegue a 12 caracteres
-                    /* $('#barcodeInput').on('input', function() {
-                         const barcode = $(this).val().trim();
-                         if (barcode.length === 12) {
-                             procesarCodigoDeBarras(barcode);
-                         }
-                     });*/
-
                     let barcodeTimeout;
 
                     $('#barcodeInput').on('input', function() {
@@ -430,10 +490,18 @@ $sesionNombre = $sesi['nombre'];   // Reemplaza con el nombre exacto de la colum
 
 
 
+
+
+
         </main>
 
     </div>
+<<<<<<< HEAD
     <script src="https://cdn.jsdelivr.net/npm/qz-tray@2.1.0/qz-tray.js"></script>
+=======
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+>>>>>>> dev_IvonneAlimentos_120525
     <script src="node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="node_modules/chart.js/dist/chart.umd.js"></script>
     <script src="js/sidebars.js"></script>

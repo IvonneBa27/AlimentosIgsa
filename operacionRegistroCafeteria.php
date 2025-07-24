@@ -66,8 +66,8 @@ $salas = $stmtSalas->fetchAll(PDO::FETCH_ASSOC);
         <!-- ========== MAIN CONTENT ========== -->
         <main class="main-content">
 
-        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                <h3 class="h2">SERVICIO DE CAFÉ</h3>
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h3 class="h2">SERVICIO DE CATERING</h3>
                 <div class="btn-toolbar mb-2 mb-md-0">
 
                     <form action="">
@@ -93,7 +93,7 @@ $salas = $stmtSalas->fetchAll(PDO::FETCH_ASSOC);
                     <form id="barcode-form">
                         <div class="form-group">
                             <label for="codigo_barras">Código de Barras</label>
-                            <input type="text" id="barcodeInput" placeholder="Escanea el código de barras" class="form-control" autofocus>
+                            <input type="text" id="barcodeInput" placeholder="Escanea el código de barras" class="form-control" autocomplete="off" autofocus>
                         </div>
                         <!--<button type="submit" class="btn btn-primary">Registrar</button>-->
                     </form>
@@ -102,7 +102,7 @@ $salas = $stmtSalas->fetchAll(PDO::FETCH_ASSOC);
 
 
             <div class="card">
-                <div class="card-header bg-dark text-white">Servicio de café</div>
+                <div class="card-header bg-dark text-white">Servicio de Catering</div>
                 <div class="card-body">
                     <table class="table table-striped" id="registros-table">
                         <thead class="thead-dark">
@@ -149,9 +149,7 @@ $salas = $stmtSalas->fetchAll(PDO::FETCH_ASSOC);
                                     <label for="departamento" class="form-label">Departamento *</label>
                                     <select id="departamento" name="departamento" class="form-select" required>
                                         <option value="">Seleccione un departamento</option>
-                                        <?php foreach ($departamentos as $departamento) : ?>
-                                            <option value="<?= $departamento['id'] ?>"><?= $departamento['nombre'] ?></option>
-                                        <?php endforeach; ?>
+                                        <!-- Los departamentos se cargarán dinámicamente -->
                                     </select>
                                 </div>
                                 <div class="col-8">
@@ -171,6 +169,10 @@ $salas = $stmtSalas->fetchAll(PDO::FETCH_ASSOC);
                                     <label for="cantidad" class="form-label">Cantidad</label>
                                     <input type="number" class="form-control" id="cantidad" name="cantidad" min="1" required>
                                 </div>
+                                <div class="mb-3">
+                                    <label for="cantidad" class="form-label">Descripción</label>
+                                    <input type="text" class="form-control" id="descripcion" name="descripcion" required>
+                                </div>
                                 <input type="hidden" id="codigoBarras">
                             </form>
                         </div>
@@ -182,24 +184,22 @@ $salas = $stmtSalas->fetchAll(PDO::FETCH_ASSOC);
                 </div>
             </div>
 
-
             <!-- Modal para cambiar el estatus a "BAJA" -->
-
             <div class="modal fade" id="deleteComensalModal" tabindex="-1" aria-labelledby="deleteComensalModalLabel" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title" id="deleteComensalModalLabel">Confirmación de Baja</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            <h5 class="modal-title" id="deleteComensalModalLabel">Cancelación del servicio</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                         </div>
                         <div class="modal-body">
                             ¿Estás seguro de que deseas cancelar el servicio?
                         </div>
                         <div class="modal-footer">
-                            <form action="delete_control_food.php" method="POST">
-                                <input type="hidden" name="id" id="id">
+                            <form action="delete_cafeteria.php" method="POST">
+                                <input type="hidden" name="id" id="delete-comensal-id">
                                 <button type="submit" class="btn btn-danger">Sí, confirmar</button>
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No, volver</button>
                             </form>
                         </div>
                     </div>
@@ -215,6 +215,37 @@ $salas = $stmtSalas->fetchAll(PDO::FETCH_ASSOC);
             <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
             <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
             <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    const empresa = document.getElementById('empresa');
+                    const depto = document.getElementById('departamento');
+
+
+                    function fill(select, items, placeholder) {
+                        select.innerHTML = `<option value="">${placeholder}</option>`;
+                        items.forEach(i => {
+                            const o = document.createElement('option');
+                            o.value = i.id;
+                            o.text = i.nombre;
+                            select.appendChild(o);
+                        });
+                    }
+
+                    empresa.addEventListener('change', function() {
+                        const id = this.value;
+                        if (!id) {
+                            fill(depto, [], 'Seleccione un departamento');
+                            return;
+                        }
+                        // Departamentos
+                        fetch(`get_departments.php?empresa_id=${id}`)
+                            .then(r => r.json())
+                            .then(data => fill(depto, data, 'Seleccione un departamento'))
+                            .catch(() => fill(depto, [], 'Seleccione un departamento'));
+
+                    });
+                });
+
+
                 $(document).ready(function() {
                     let barcodeTimeout;
 
@@ -246,12 +277,18 @@ $salas = $stmtSalas->fetchAll(PDO::FETCH_ASSOC);
                         }
                     });
 
-                    // Evento cuando se hace clic en el botón "Confirmar"
+
+                    // ▶︎ Cancelar servicio (abre el modal con el ID)
+                    $(document).on('click', '.btn-cancelar-servicio', function() {
+                        const id = $(this).data('id');
+                        $('#delete-comensal-id').val(id);
+                    });
+
                     $("#confirmarRegistro").click(function(e) {
-                        e.preventDefault(); // Evita que el formulario se envíe normalmente
+                        e.preventDefault(); // Evita envío normal
 
                         // Obtener los datos del formulario
-                        var formData = {
+                        const formData = {
                             barcode: $("#codigoBarras").val(),
                             empresa_id: $("#empresa").val(),
                             departamento_id: $("#departamento").val(),
@@ -259,13 +296,16 @@ $salas = $stmtSalas->fetchAll(PDO::FETCH_ASSOC);
                             solicitante: $("#solicitante").val(),
                             cantidad: $("#cantidad").val()
                         };
-
                         console.log("Enviando datos:", formData);
 
-                        // Validar que los campos obligatorios no estén vacíos
+                        // Validar campos obligatorios
                         if (!formData.empresa_id || !formData.departamento_id || !formData.sala_id || !formData.solicitante || !formData.cantidad) {
-                            alert("Por favor, complete todos los campos.");
-                            return;
+                            return Swal.fire({
+                                icon: 'warning',
+                                title: 'Campos incompletos',
+                                text: 'Por favor, complete todos los campos.',
+                                confirmButtonColor: '#ffc107'
+                            });
                         }
 
                         // Enviar datos con AJAX
@@ -278,21 +318,39 @@ $salas = $stmtSalas->fetchAll(PDO::FETCH_ASSOC);
                                 console.log("Respuesta del servidor:", response);
 
                                 if (response.success) {
-                                    alert(response.message); // Mostrar mensaje de éxito
-                                    $("#registroModal").modal("hide"); // Cerrar modal
-                                    $("#barcodeInput").val(""); // Limpiar input del código de barras
-                                    cargarRegistros(); // Recargar tabla de registros
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: '¡Registro exitoso!',
+                                        text: response.message,
+                                        confirmButtonText: 'OK',
+                                        confirmButtonColor: '#28a745'
+                                    }).then(() => {
+                                        $("#registroModal").modal("hide"); // Cerrar modal
+                                        $("#barcodeInput").val(''); // Limpiar código
+                                        cargarRegistros(); // Refrescar tabla
+                                    });
                                 } else {
-                                    alert(response.message); // Mostrar mensaje de error
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Error',
+                                        text: response.message,
+                                        confirmButtonText: 'Cerrar',
+                                        confirmButtonColor: '#d33'
+                                    });
                                 }
                             },
-                            error: function(xhr, status, error) {
+                            error: function(xhr) {
                                 console.error("Error en la petición:", xhr.responseText);
-                                alert("Ocurrió un error al registrar la cortesía.");
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error de servidor',
+                                    text: 'Ocurrió un error al registrar la cortesía.',
+                                    confirmButtonText: 'Cerrar',
+                                    confirmButtonColor: '#d33'
+                                });
                             }
                         });
                     });
-
                     // Función para cargar registros en la tabla
                     function cargarRegistros() {
                         $.ajax({
@@ -321,7 +379,11 @@ $salas = $stmtSalas->fetchAll(PDO::FETCH_ASSOC);
                                 <td>${registro.cantidad}</td>
                                 <td>${registro.fecha_registro}</td>
                                 <td>${estatusHTML}</td>
-                                <td><button class="btn btn-danger btn-sm">Cancelar</button></td>
+                                  <td>
+                                <button class="btn btn-dark btn-sm btn-cancelar-servicio" data-id="${registro.id}" data-bs-toggle="modal" data-bs-target="#deleteComensalModal">
+                                    Cancelar
+                                </button>
+                            </td>
                             </tr>
                         `);
                                     });

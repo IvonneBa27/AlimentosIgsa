@@ -11,9 +11,9 @@ if (!isset($_SESSION['resultado'])) {
 }
 
 $sesi = $_SESSION['resultado'];
-    $sesionUsuario = $sesi['usuario']; // Reemplaza con el nombre exacto de la columna
-    $sesionNombre = $sesi['nombre'];   // Reemplaza con el nombre exacto de la columna
-    $sesionUsuarioId = $sesi['id']; 
+$sesionUsuario = $sesi['usuario']; // Reemplaza con el nombre exacto de la columna
+$sesionNombre = $sesi['nombre'];   // Reemplaza con el nombre exacto de la columna
+$sesionUsuarioId = $sesi['id'];
 
 require 'vendor/autoload.php';
 
@@ -32,6 +32,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $departamento = strtoupper(trim($_POST['departamento']));
     $puesto = strtoupper(trim($_POST['puesto']));
     $correo = !empty($_POST['correo']) ? trim($_POST['correo']) : null;
+    $t_desayuno = in_array('Desayuno', $_POST['tiempos_comida'] ?? []) ? 1 : 0;
+    $t_colacion = in_array('Colación', $_POST['tiempos_comida'] ?? []) ? 1 : 0;
+    $t_comida   = in_array('Comida', $_POST['tiempos_comida'] ?? []) ? 1 : 0;
+    $t_cena     = in_array('Cena', $_POST['tiempos_comida'] ?? []) ? 1 : 0;
+
+
 
     $estatus = 1;
     $tipo_usuario = 1;
@@ -118,12 +124,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     imagedestroy($barcodeImageResource);
     imagedestroy($finalImage);
 
+
+    // Insertar en la base de datos — antes agregamos esta validación
+    $check_sql = "SELECT id FROM comensal WHERE barcode = ? OR nombre_completo = ?";
+    $check_stmt = $con->prepare($check_sql);
+    $check_stmt->bind_param("ss", $codigoFinal, $nombre_completo);
+    $check_stmt->execute();
+    $check_stmt->store_result();
+
+    if ($check_stmt->num_rows > 0) {
+        header("Location: adminComensales.php?alerta=duplicado");
+        exit();
+    }
+
+
     // Insertar en la base de datos
-    $sql = "INSERT INTO comensal (a_paterno, a_materno, nombre, nombre_completo, num_empleado, empresa, departamento, puesto, correo, imagePath, barcode, barcode_path, estatus, tipo_usuario)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    $sql = "INSERT INTO comensal (a_paterno, a_materno, nombre, nombre_completo, num_empleado, empresa, departamento, puesto, correo, imagePath, barcode, barcode_path, estatus, tipo_usuario, user_id, t_desayuno, t_colacion, t_comida, t_cena)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     $stmt = $con->prepare($sql);
     $stmt->bind_param(
-        "ssssisssssssis",
+        "ssssisssssssisiiiii",
         $a_paterno,
         $a_materno,
         $nombre,
@@ -137,7 +157,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $codigoFinal,
         $barcodePath,
         $estatus,
-        $tipo_usuario
+        $tipo_usuario,
+        $sesionUsuarioId,
+        $t_desayuno,
+        $t_colacion,
+        $t_comida,
+        $t_cena
+
     );
 
     if ($stmt->execute()) {
@@ -154,15 +180,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                 $mail->setFrom('apps-zumpango@igsamedical.com', 'SISTEMA CONTROL DE ALIMENTOS');
                 $mail->addAddress($correo);
-
+                $mail->CharSet = 'UTF-8';
+                $mail->Encoding = 'base64';
                 $mail->isHTML(true);
-                $mail->Subject = 'Codigo de Barras - Sistema Control de Alimentos';
+                $mail->Subject = 'Registro exitoso - Sistema Control de Alimentos';
                 $mail->Body = "
                                 <h1>Bienvenido al Sistema de Comedor</h1>
                                 <p>Estimado(a) $nombre_completo,</p>
                                 <p>Gracias por registrarte en nuestro sistema. Por este medio, se ha generado y compartido tu código de barras personal.</p>
                                 <p>Este código será necesario para ingresar al comedor y realizar tu checklist correspondiente.</p>
                                 <p>Si tienes alguna duda, no dudes en contactarnos.</p>
+                                 <p>Consulta nuestro <a href='https://igsa1-my.sharepoint.com/:b:/g/personal/apps-zumpango_igsamedical_com/EfmeKXrrAxFEoyMPPyIunVgBZ-2YdTVkg1WYTWzuxg22mA?e=ho0DsW' target='_blank'>Aviso de Privacidad</a>.</p>
+    <br>
                                 <p>Atentamente,</p>
                                 <p><strong>Sistema de Control de Alimentos</strong></p>
                             ";
@@ -174,8 +203,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 echo "Error al enviar correo: {$mail->ErrorInfo}";
             }
         }
+        header("Location: adminComensales.php?alerta=registrado");
 
-        header("Location:adminComensales.php");
+
         exit();
     } else {
         echo "Error al registrar comensal: " . $stmt->error;

@@ -28,6 +28,8 @@ function verificarRangoHora(fechaHora) {
         { inicio: '12:31', fin: '16:00', campo: 'Col_Vespertina' },
         { inicio: '16:01', fin: '17:30', campo: 'Cena' },
         { inicio: '17:31', fin: '21:00', campo: 'Col_Nocturna' }
+
+    
     ];
 
     var horaActual = ('0' + fechaHora.getHours()).slice(-2) + ':' + ('0' + fechaHora.getMinutes()).slice(-2);

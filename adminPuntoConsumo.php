@@ -51,6 +51,7 @@ $establecimientos = $stmtEstablecimientos->fetchAll(PDO::FETCH_ASSOC);
     <script src="js/color-modes.js"></script>
     <link rel="stylesheet" href="node_modules/bootstrap-icons/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    
 
 
 
@@ -74,7 +75,7 @@ $establecimientos = $stmtEstablecimientos->fetchAll(PDO::FETCH_ASSOC);
 
                     <form action="">
                         <div class="btn-group me-2">
-                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="location.href = 'adminProducto.php';">
+                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="location.href = 'adminPuntoConsumo.php';">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-clockwise" viewBox="0 0 16 16">
                                     <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2z" />
                                     <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466" />
@@ -84,12 +85,6 @@ $establecimientos = $stmtEstablecimientos->fetchAll(PDO::FETCH_ASSOC);
                     </form>
                 </div>
             </div>
-
-
-
-
-
-
 
             <div class="table-responsive" style="max-height: 830px; overflow-y: auto;">
                 <table class="table table-striped">
@@ -241,7 +236,7 @@ $establecimientos = $stmtEstablecimientos->fetchAll(PDO::FETCH_ASSOC);
 
 
             <!-- Modal para editar producto -->
-            <div class="modal fade" id="editProductModal" tabindex="-1" aria-labelledby="editProductModalLabel" aria-hidden="true">
+            <div class="modal fade" id="editConsumoModal" tabindex="-1" aria-labelledby="editConsumoModalLabel" aria-hidden="true">
                 <div class="modal-dialog modal-lg">
                     <div class="modal-content">
                         <div class="modal-header">
@@ -252,15 +247,15 @@ $establecimientos = $stmtEstablecimientos->fetchAll(PDO::FETCH_ASSOC);
                         </div>
                         <div class="modal-body">
                             <form id="editProductForm" action="update_product.php" method="POST">
-                                <input type="hidden" name="id" id="editProductId">
+                                <input type="hidden" name="id" id="editConsumotId">
                                 <div class="card">
                                     <h5 class="card-header">Información General</h5>
                                     <div class="card-body">
                                         <div class="row">
                                             <div class="col-md-6">
                                                 <div class="form-group">
-                                                    <label for="editProducto" class="control-label">Producto *</label>
-                                                    <input type="text" id="editProducto" name="producto" class="form-control" placeholder="Nombre del producto" required style="text-transform:uppercase;">
+                                                    <label for="editConsumo" class="control-label">Producto *</label>
+                                                    <input type="text" id="editConsumo" name="producto" class="form-control" placeholder="Nombre del producto" required style="text-transform:uppercase;">
                                                 </div>
                                             </div>
                                         </div>
@@ -278,11 +273,11 @@ $establecimientos = $stmtEstablecimientos->fetchAll(PDO::FETCH_ASSOC);
 
 
             <!-- Modal de confirmación para dar de baja el producto -->
-            <div class="modal fade" id="deleteProductModal" tabindex="-1" aria-labelledby="deleteProductModalLabel" aria-hidden="true">
+            <div class="modal fade" id="deleteConsumoModal" tabindex="-1" aria-labelledby="deleteConsumoModalLabel" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title" id="deleteProductModalLabel">Confirmación de Baja</h5>
+                            <h5 class="modal-title" id="deleteConsumoModalLabel">Confirmación de Baja</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
@@ -307,23 +302,11 @@ $establecimientos = $stmtEstablecimientos->fetchAll(PDO::FETCH_ASSOC);
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
 
+
 <script>
-    // Captura el evento de apertura del modal para cambiar la imagen según el producto
-    $('#barcodeModal').on('show.bs.modal', function(event) {
-        var button = $(event.relatedTarget); // Elemento que activó el modal
-        var barcodePath = button.data('barcode'); // Obtiene la ruta de la imagen del atributo data-barcode
-        var modal = $(this);
-        modal.find('#barcodeImage').attr('src', barcodePath); // Cambia la ruta de la imagen en el modal
-    });
 
 
-    // Función para pasar el ID del usuario al campo oculto del formulario en el modal de eliminación
-    function setUserId(id) {
-        document.getElementById('id').value = id;
-    }
-
-
-    // Función para cargar la imagen y detalles del producto en el modal
+        // Función para cargar la imagen y detalles del producto en el modal
     function openBarcodeModal(barcodeSrc, productInfo) {
         // Configurar la fuente de la imagen del código de barras y los detalles del producto
         document.getElementById('barcodeImage').src = barcodeSrc;
@@ -332,6 +315,21 @@ $establecimientos = $stmtEstablecimientos->fetchAll(PDO::FETCH_ASSOC);
         // Mostrar el modal
         $('#barcodeModal').modal('show');
     }
+
+
+    // Función para pasar el ID del usuario al campo oculto del formulario en el modal de eliminación
+    function setUserId(id) {
+        document.getElementById('id').value = id;
+    }
+
+
+    // Captura el evento de apertura del modal para cambiar la imagen según el producto
+    $('#barcodeModal').on('show.bs.modal', function(event) {
+        var button = $(event.relatedTarget); // Elemento que activó el modal
+        var barcodePath = button.data('barcode'); // Obtiene la ruta de la imagen del atributo data-barcode
+        var modal = $(this);
+        modal.find('#barcodeImage').attr('src', barcodePath); // Cambia la ruta de la imagen en el modal
+    });
 
     // Función para imprimir solo el contenido del código de barras y la información
     function printBarcode() {
@@ -355,14 +353,14 @@ $establecimientos = $stmtEstablecimientos->fetchAll(PDO::FETCH_ASSOC);
 
 
     // Capturar el evento de apertura del modal de edición
-    $('#editProductModal').on('show.bs.modal', function(event) {
+    $('#editConsumoModal').on('show.bs.modal', function(event) {
         var button = $(event.relatedTarget); // Elemento que activó el modal
         var id = button.data('id'); // ID del producto
         var producto = button.data('producto'); // Nombre del producto
 
         // Asignar valores a los campos del formulario en el modal
-        $('#editProductId').val(id);
-        $('#editProducto').val(producto);
+        $('#editConsumoId').val(id);
+        $('#editConsumo').val(producto);
     });
 </script>
 

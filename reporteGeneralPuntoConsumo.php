@@ -197,22 +197,38 @@ include 'db_connection.php';
             $('#btn-exportar').on('click', function() {
                 window.location.href = 'exportar_excel_punto_venta.php?' + $('#filtro-form').serialize();
             });
-
             $('#btn-enviar-correo').on('click', function() {
                 const correos = $('#correos').val();
                 if (!correos) {
-                    alert('Por favor, ingresa al menos un correo.');
-                    return;
+                    return Swal.fire({
+                        icon: 'warning',
+                        title: 'Faltan correos',
+                        text: 'Por favor, ingresa al menos un correo.',
+                        confirmButtonColor: '#ffc107'
+                    });
                 }
                 const filtros = $('#filtro-form').serialize();
                 $.post('enviar_correo_punto_venta.php', {
                     correos,
                     filtros
                 }, function(response) {
-                    alert(response.mensaje || 'Correo enviado exitosamente.');
-                    $('#modalEnviarCorreo').modal('hide');
-                }).fail(function() {
-                    alert('Error al enviar correo.');
+                    Swal.fire({
+                        icon: response.mensaje && response.mensaje.toLowerCase().includes('error') ? 'error' : 'success',
+                        title: response.mensaje.includes('Error') ? 'Error' : '¡Éxito!',
+                        text: response.mensaje,
+                        confirmButtonColor: response.mensaje.includes('Error') ? '#d33' : '#28a745'
+                    }).then(() => {
+                        $('#modalEnviarCorreo').modal('hide');
+                        $('.modal-backdrop').remove(); // ✅ Eliminar la capa negra
+                        $('body').removeClass('modal-open'); // ✅ Evitar scroll bloqueado
+                    });
+                }, 'json').fail(function() {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error de servidor',
+                        text: 'Error al enviar correo.',
+                        confirmButtonColor: '#d33'
+                    });
                 });
             });
         });

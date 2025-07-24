@@ -12,6 +12,13 @@ if (!isset($_SESSION['resultado'])) {
 $sesionUsuario = $sesi['usuario']; // Reemplaza con el nombre exacto de la columna
 $sesionNombre = $sesi['nombre'];   // Reemplaza con el nombre exacto de la columna
 
+$alerta = '';
+if (isset($_GET['error']) && $_GET['error'] === 'duplicado') {
+    $alerta = 'duplicado';
+} elseif (isset($_SESSION['correo_enviado'])) {
+    $alerta = 'correo';
+    unset($_SESSION['correo_enviado']); // Para no repetir la alerta al recargar
+}
 
 
 include 'db_connection.php';
@@ -30,7 +37,7 @@ $totalRegistros = $totalRegistrosStmt->fetch(PDO::FETCH_ASSOC)['total'];
 $totalPaginas = ceil($totalRegistros / $registrosPorPagina);
 
 // Consulta base con paginación
-$sql = "SELECT co.id, co.nombre_completo, co.a_paterno, co.a_materno, co.nombre, co.num_empleado, co.empresa, co.departamento, co.correo, co.barcode, co.barcode_path, co.imagePath, emp.nombre as nombre_empresa, co.fecha_de_alta, co.puesto, cs.status
+$sql = "SELECT co.id, co.nombre_completo, co.a_paterno, co.a_materno, co.nombre, co.num_empleado, co.empresa, co.departamento, co.correo, co.barcode, co.barcode_path, co.imagePath, emp.nombre as nombre_empresa, co.fecha_de_alta, co.puesto, cs.status, co.t_desayuno, co.t_colacion, co.t_comida, co.t_cena
         FROM comensal co 
         INNER JOIN catalog_status cs ON cs.status_id = co.estatus
         INNER JOIN empresa emp ON co.empresa = emp.id
@@ -48,6 +55,13 @@ $sqlEmpresas = "SELECT id, nombre FROM empresa WHERE estatus_id = 1";
 $stmtEmpresas = $conn->prepare($sqlEmpresas);
 $stmtEmpresas->execute();
 $empresas = $stmtEmpresas->fetchAll(PDO::FETCH_ASSOC);
+
+
+// Obtener las empresas para el select
+$sqlDepartamentos = "SELECT id, nombre FROM departamento WHERE estatus_id = 1";
+$stmtDepartamentos = $conn->prepare($sqlDepartamentos);
+$stmtDepartamentos->execute();
+$departamentos = $stmtDepartamentos->fetchAll(PDO::FETCH_ASSOC);
 
 ?>
 
@@ -69,9 +83,11 @@ $empresas = $stmtEmpresas->fetchAll(PDO::FETCH_ASSOC);
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
 
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
-
-
+    <!-- Bootstrap JS (¡necesario para que modales funcionen!) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </head>
 
 <body>
@@ -165,8 +181,13 @@ $empresas = $stmtEmpresas->fetchAll(PDO::FETCH_ASSOC);
                                     <td><?= htmlspecialchars($comensal['correo']) ?></td>
                                     <td><?= htmlspecialchars($comensal['barcode']) ?></td>
                                     <td class="text-center align-middle">
-                                        <a href="#" data-bs-toggle="modal" data-bs-target="#barcodeModal"
-                                            data-barcode="<?= htmlspecialchars($comensal['barcode_path']) ?>">
+                                        <a href="#"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#barcodeModal"
+                                            data-barcode="<?= htmlspecialchars($comensal['barcode_path']) ?>"
+                                            data-barcodeinfo="<?= htmlspecialchars($comensal['barcode']) ?>"
+                                            data-correo="<?= htmlspecialchars($comensal['correo']) ?>"
+                                            data-id="<?= htmlspecialchars($comensal['id']) ?>">
                                             <i class="fas fa-barcode"></i>
                                         </a>
                                     </td>
@@ -181,7 +202,7 @@ $empresas = $stmtEmpresas->fetchAll(PDO::FETCH_ASSOC);
                                     <!--<td><?= htmlspecialchars($comensal['status']) ?></td>-->
                                     <td>
                                         <?php if (trim($comensal['status']) === 'ACTIVO'): ?>
-                                            <span class="badge bg-success">ACTIVO</span>
+                                            <span class="badge bg-success">ACTIVO</span>.
                                         <?php elseif (trim($comensal['status']) === 'BAJA'): ?>
                                             <span class="badge bg-danger">BAJA</span>
                                         <?php else: ?>
@@ -203,6 +224,14 @@ $empresas = $stmtEmpresas->fetchAll(PDO::FETCH_ASSOC);
                                             data-correo="<?= htmlspecialchars($comensal['correo'] ?? '') ?>"
                                             data-barcode="<?= htmlspecialchars($comensal['barcode'] ?? '') ?>"
                                             data-image="<?= htmlspecialchars($comensal['imagePath'] ?? '') ?>"
+                                            data-desayuno="<?= htmlspecialchars($comensal['t_desayuno'] ?? '') ?>"
+                                            data-colacion="<?= htmlspecialchars($comensal['t_colacion'] ?? '') ?>"
+                                            data-comida="<?= htmlspecialchars($comensal['t_comida'] ?? '') ?>"
+                                            data-cena="<?= htmlspecialchars($comensal['t_cena'] ?? '') ?>"
+
+
+
+
                                             data-bs-toggle="modal"
                                             data-bs-target="#editComensalModal">
                                             <i class="fas fa-edit"></i>
@@ -217,6 +246,18 @@ $empresas = $stmtEmpresas->fetchAll(PDO::FETCH_ASSOC);
                                             onclick="setUserId(<?= htmlspecialchars($comensal['id']) ?>)">
                                             <i class="fas fa-trash-alt"></i>
                                         </a>
+
+                                        <!-- Icono de alta (solo visible si el estatus es BAJA) -->
+                                        <?php if (trim($comensal['status']) === 'BAJA'): ?>
+                                            &nbsp;
+                                            <a href="#"
+                                                data-id="<?= htmlspecialchars($comensal['id']) ?>"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#altaComensalModal"
+                                                onclick="setAltaId(<?= htmlspecialchars($comensal['id']) ?>)">
+                                                <i class="fas fa-user-alt"></i>
+                                            </a>
+                                        <?php endif; ?>
 
 
 
@@ -344,32 +385,32 @@ $empresas = $stmtEmpresas->fetchAll(PDO::FETCH_ASSOC);
                                 <div class="row">
                                     <div class="col-md-3">
                                         <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" name="tiempos_comida[]" value="Desayuno" id="desayuno">
-                                            <label class="form-check-label" for="desayuno">
+                                            <input class="form-check-input" type="checkbox" name="tiempos_comida[]" value="Desayuno" id="t_desayuno">
+                                            <label class="form-check-label" for="t_desayuno">
                                                 Desayuno
                                             </label>
                                         </div>
                                     </div>
                                     <div class="col-md-3">
                                         <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" name="tiempos_comida[]" value="Comida" id="comida">
-                                            <label class="form-check-label" for="comida">
+                                            <input class="form-check-input" type="checkbox" name="tiempos_comida[]" value="Comida" id="t_comida">
+                                            <label class="form-check-label" for="t_comida">
                                                 Comida
                                             </label>
                                         </div>
                                     </div>
                                     <div class="col-md-3">
                                         <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" name="tiempos_comida[]" value="Cena" id="cena">
-                                            <label class="form-check-label" for="cena">
+                                            <input class="form-check-input" type="checkbox" name="tiempos_comida[]" value="Cena" id="t_cena">
+                                            <label class="form-check-label" for="t_cena">
                                                 Cena
                                             </label>
                                         </div>
                                     </div>
                                     <div class="col-md-3">
                                         <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" name="tiempos_comida[]" value="Colación" id="colacion">
-                                            <label class="form-check-label" for="colacion">
+                                            <input class="form-check-input" type="checkbox" name="tiempos_comida[]" value="Colación" id="t_colacion">
+                                            <label class="form-check-label" for="t_colacion">
                                                 Colación
                                             </label>
                                         </div>
@@ -441,6 +482,7 @@ $empresas = $stmtEmpresas->fetchAll(PDO::FETCH_ASSOC);
                                                 <option value="<?= $departamento['id'] ?>"><?= $departamento['nombre'] ?></option>
                                             <?php endforeach; ?>
 
+
                                         </select>
                                     </div>
                                     <div class="col-4">
@@ -450,10 +492,7 @@ $empresas = $stmtEmpresas->fetchAll(PDO::FETCH_ASSOC);
 
                                     <div class="col-8">
                                         <label for="edit_correo" class="form-label">Correo Electronico *</label>
-                                        <span id="email-display">********@<?= explode('@', htmlspecialchars($comensal['correo'] ?? ''))[1] ?></span>
-                                        <span id="email-full" style="display: none;"></span>
-                                        <i id="toggle-email" class="fas fa-eye" style="cursor: pointer;"></i> <!-- Icono de ojo -->
-                                        <!-- <input type="text" id="edit_correo" name="correo" class="form-control" required>-->
+                                        <input type="text" id="edit_correo" name="correo" class="form-control" required>
                                     </div>
                                     <div class="col-8">
                                         <label for="edit_correo" class="form-label">Codigo del Empleado</label>
@@ -482,6 +521,47 @@ $empresas = $stmtEmpresas->fetchAll(PDO::FETCH_ASSOC);
                             </div>
                         </div>
 
+                        <!-- Tiempos de Comida -->
+                        <div class="card mb-3">
+                            <h5 class="card-header">Tiempos de Comida</h5>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="edit_tiempos_comida[]" value="Desayuno" id="edit_t_desayuno">
+                                            <label class="form-check-label" for="t_desayuno">
+                                                Desayuno
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="edit_tiempos_comida[]" value="Comida" id="edit_t_comida">
+                                            <label class="form-check-label" for="t_comida">
+                                                Comida
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="edit_tiempos_comida[]" value="Cena" id="edit_t_cena">
+                                            <label class="form-check-label" for="t_cena">
+                                                Cena
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="edit_tiempos_comida[]" value="Colación" id="edit_t_colacion">
+                                            <label class="form-check-label" for="t_colacion">
+                                                Colación
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <button type="submit" class="btn btn-success">Guardar Cambios</button>
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                     </form>
@@ -491,25 +571,6 @@ $empresas = $stmtEmpresas->fetchAll(PDO::FETCH_ASSOC);
     </div>
 
 
-    <!-- Modal: Código de Barras -->
-    <div class="modal fade" id="barcodeModal" tabindex="-1" aria-labelledby="barcodeModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="barcodeModalLabel">Código de Barras</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body text-center">
-                    <p id="barcodeInfo"></p>
-                    <img id="barcodeImage" src="" alt="Código de Barras" class="img-fluid">
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" id="printBarcode">Imprimir</button>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <!-- Modal: Imagen de Perfil -->
     <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
@@ -529,6 +590,9 @@ $empresas = $stmtEmpresas->fetchAll(PDO::FETCH_ASSOC);
         </div>
     </div>
 
+
+
+
     <!-- Modal de confirmación para dar de baja el producto -->
     <div class="modal fade" id="deleteComensalModal" tabindex="-1" aria-labelledby="deleteComensalModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
@@ -542,7 +606,7 @@ $empresas = $stmtEmpresas->fetchAll(PDO::FETCH_ASSOC);
                 </div>
                 <div class="modal-footer">
                     <form action="delete_comensal.php" method="POST">
-                        <input type="hidden" name="id" id="id">
+                        <input type="hidden" name="id" id="deleteComensalId">
                         <button type="submit" class="btn btn-danger">Sí, dar de baja</button>
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                     </form>
@@ -552,12 +616,130 @@ $empresas = $stmtEmpresas->fetchAll(PDO::FETCH_ASSOC);
     </div>
 
 
+    <!-- Modal de confirmación para dar de baja el producto -->
+    <div class="modal fade" id="altaComensalModal" tabindex="-1" aria-labelledby="altaComensalModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="altaComensalModalLabel">Activación de usuario</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    ¿Estás seguro de que deseas dar de alta al comensal?
+                </div>
+                <div class="modal-footer">
+                    <form action="alta_comensal.php" method="POST">
+                        <input type="hidden" name="id" id="altaComensalId">
+                        <button type="submit" class="btn btn-success">Sí, dar de alta</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Código de Barras -->
+    <div class="modal fade" id="barcodeModal" tabindex="-1" aria-labelledby="barcodeModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="barcodeModalLabel">Código de Barras</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <p id="barcodeInfo"></p>
+                    <img id="barcodeImage" src="" alt="Código de Barras" class="img-fluid">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="printBarcode">Imprimir</button>
+                    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#emailModal">Enviar por Correo</button>
+
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- Modal: Confirmar Correo -->
+    <div class="modal fade" id="emailModal" tabindex="-1" aria-labelledby="emailModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="emailModalLabel">Enviar Código por Correo</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <form id="formEnviarCorreo" method="POST" action="enviar_correo_barcode.php">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="correoDestino" class="form-label">Correo electrónico:</label>
+                            <input type="hidden" name="id" id="id">
+                            <input type="hidden" name="barcode" id="barcode">
+                            <input type="email" class="form-control" name="correo" id="correoDestino" required>
+
+                        </div>
+                        <div class="modal-footer">
+                            <button id="enviarCorreoBtn" type="submit" class="btn btn-primary">Enviar</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+
+
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <script>
+        const barcodeModal = document.getElementById('barcodeModal');
+        if (barcodeModal) {
+            barcodeModal.addEventListener('show.bs.modal', function(event) {
+                const button = event.relatedTarget;
+
+                const barcodePath = button.getAttribute('data-barcode');
+                const barcodeInfo = button.getAttribute('data-barcodeinfo'); // antes era 'data-info'
+
+                const correo = button.getAttribute('data-correo');
+                const id = button.getAttribute('data-id');
+
+                // Mostrar la información en el modal
+                document.getElementById('barcodeInfo').textContent = barcodeInfo;
+                document.getElementById('barcodeImage').src = barcodePath;
+
+                // Asignar valores a campos ocultos del formulario de envío
+                document.getElementById('correoDestino').value = correo;
+                document.getElementById('id').value = id;
+                document.getElementById('barcode').value = barcodeInfo;
+
+            });
+        }
+
+
+
+
+        // Modal para imagen de perfil
+        /* const imageModal = document.getElementById('imageModal');
+         if (imageModal) {
+             imageModal.addEventListener('show.bs.modal', function(event) {
+                 const button = event.relatedTarget;
+                 const imageSrc = button.getAttribute('data-image');
+                 document.getElementById('profileImage').src = imageSrc || 'default.jpg';
+             });
+         }*/
+
+
+
+
         function initializeCamera(modalId, videoId, canvasId, imageId, snapId, imageDataId) {
             const modal = document.getElementById(modalId);
             const video = document.getElementById(videoId);
@@ -628,34 +810,19 @@ $empresas = $stmtEmpresas->fetchAll(PDO::FETCH_ASSOC);
 
 
 
-        // Modal para código de barras
-        const barcodeModal = document.getElementById('barcodeModal');
-        if (barcodeModal) {
-            barcodeModal.addEventListener('show.bs.modal', function(event) {
-                const button = event.relatedTarget;
-                const barcodePath = button.getAttribute('data-barcode');
-                const info = button.getAttribute('data-info');
-                document.getElementById('barcodeInfo').textContent = info;
-                document.getElementById('barcodeImage').src = barcodePath;
-            });
-        }
 
-        // Modal para imagen de perfil
-        const imageModal = document.getElementById('imageModal');
-        if (imageModal) {
-            imageModal.addEventListener('show.bs.modal', function(event) {
-                const button = event.relatedTarget;
-                const imageSrc = button.getAttribute('data-image');
-                document.getElementById('profileImage').src = imageSrc || 'default.jpg';
-            });
-        }
 
 
         // Función para pasar el ID del usuario al campo oculto del formulario en el modal de eliminación
         function setUserId(id) {
-            document.getElementById('id').value = id;
+            document.getElementById('deleteComensalId').value = id;
         }
 
+
+        // Función para pasar el ID del usuario al campo oculto del formulario en el modal de eliminación
+        function setAltaId(id) {
+            document.getElementById('altaComensalId').value = id;
+        }
 
         // Capturar el evento de apertura del modal de edición
         $('#editComensalModal').on('show.bs.modal', function(event) {
@@ -673,6 +840,10 @@ $empresas = $stmtEmpresas->fetchAll(PDO::FETCH_ASSOC);
             var correo = button.data('correo');
             var barcode = button.data('barcode');
             var image = button.data('image');
+            var desayuno = button.data('desayuno');
+            var colacion = button.data('colacion');
+            var comida = button.data('comida');
+            var cena = button.data('cena');
 
 
             // Asignar los valores a los campos del formulario en el modal
@@ -686,15 +857,23 @@ $empresas = $stmtEmpresas->fetchAll(PDO::FETCH_ASSOC);
             $('#edit_puesto').val(puesto);
             $('#edit_correo').val(correo);
             $('#edit_barcode').val(barcode);
+            $('#edit_t_desayuno').prop('checked', desayuno == 1);
+            $('#edit_t_colacion').prop('checked', colacion == 1);
+            $('#edit_t_comida').prop('checked', comida == 1);
+            $('#edit_t_cena').prop('checked', cena == 1);
 
 
-            // Si existe una imagen, mostrarla en el modal
+
+            // Si existe una imagen, mostrarla; si no, ocultar la imagen
             if (image) {
-                $('#image-edit').attr('src', image);
-                $('#imageData').val(image); // Asignar la imagen (base64 o URL) al campo oculto
+                $('#image-edit').attr('src', image).show();
+                $('#imageData').val(image); // Si estás usando base64 u otro formato
+            } else {
+                $('#image-edit').removeAttr('src').hide(); // Oculta la imagen anterior
+                $('#imageData').val(''); // Limpia el input oculto también
             }
-        });
 
+        });
 
 
 
@@ -787,44 +966,58 @@ $empresas = $stmtEmpresas->fetchAll(PDO::FETCH_ASSOC);
                 });
             });
         });
-
-        document.addEventListener('DOMContentLoaded', function() {
-            const modal = document.getElementById('editComensalModal');
-            modal.addEventListener('show.bs.modal', function(event) {
-                const button = event.relatedTarget; // El botón o enlace que abrió el modal
-                const correo = button.getAttribute('data-correo'); // Obtener el correo del enlace
-
-                // Mostrar el correo oculto en el modal
-                const emailDisplay = document.getElementById('email-display');
-                const emailFull = document.getElementById('email-full');
-                const icon = document.getElementById('toggle-email');
-
-                // Aquí se asume que el correo tiene un formato válido, lo mostramos parcialmente
-                emailDisplay.textContent = `********@${correo.split('@')[1]}`; // Mostrar solo el dominio y ocultar el resto
-                emailFull.textContent = correo; // El correo completo está en emailFull
-
-                // Funcionalidad para mostrar/ocultar el correo
-                icon.addEventListener('click', function() {
-                    if (emailDisplay.style.display !== 'none') {
-                        emailDisplay.style.display = 'none';
-                        emailFull.style.display = 'inline';
-                        icon.classList.remove('fa-eye');
-                        icon.classList.add('fa-eye-slash'); // Cambiar icono de ojo abierto a cerrado
-                    } else {
-                        emailFull.style.display = 'none';
-                        emailDisplay.style.display = 'inline';
-                        icon.classList.remove('fa-eye-slash');
-                        icon.classList.add('fa-eye'); // Cambiar icono de ojo cerrado a abierto
-                    }
-                });
-            });
-        });
     </script>
 
 
+    <!-- Incluye SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+    <?php
+    $alerta = $_GET['alerta'] ?? null; // Esto ya deberías tenerlo antes
+    ?>
 
+    <?php if ($alerta === 'duplicado'): ?>
+        <script>
+            Swal.fire({
+                icon: 'error',
+                title: 'Ups...',
+                html: '<strong>¡Este comensal ya está registrado!</strong><br>Verifica el nombre o código de barras.',
+                confirmButtonColor: '#3085d6'
+            }).then(() => {
+                if (window.history.replaceState) {
+                    window.history.replaceState(null, null, window.location.pathname);
+                }
+            });
+        </script>
 
+    <?php elseif ($alerta === 'correo'): ?>
+        <script>
+            Swal.fire({
+                icon: 'success',
+                title: 'Correo enviado correctamente',
+                text: 'El código de barras fue enviado al correo del comensal.',
+                confirmButtonColor: '#3085d6'
+            }).then(() => {
+                if (window.history.replaceState) {
+                    window.history.replaceState(null, null, window.location.pathname);
+                }
+            });
+        </script>
+
+    <?php elseif ($alerta === 'registrado'): ?>
+        <script>
+            Swal.fire({
+                icon: 'success',
+                title: '¡Registro exitoso!',
+                text: 'El comensal ha sido registrado correctamente.',
+                confirmButtonColor: '#3085d6'
+            }).then(() => {
+                if (window.history.replaceState) {
+                    window.history.replaceState(null, null, window.location.pathname);
+                }
+            });
+        </script>
+    <?php endif; ?>
 
 
 
@@ -843,5 +1036,25 @@ $empresas = $stmtEmpresas->fetchAll(PDO::FETCH_ASSOC);
 
     <?php include 'footer.php'; ?>
 </body>
+
+<script>
+    const imageModal = document.getElementById('imageModal');
+    if (imageModal) {
+        imageModal.addEventListener('show.bs.modal', function(event) {
+            const button = event.relatedTarget;
+            const imageSrc = button.getAttribute('data-image');
+            const profileImage = document.getElementById('profileImage');
+
+            console.log("🖼 Imagen a mostrar:", imageSrc);
+
+            if (imageSrc && imageSrc.trim() !== '') {
+                profileImage.src = imageSrc;
+            } else {
+                profileImage.src = 'images/default-profile.png';
+            }
+        });
+    }
+</script>
+
 
 </html>

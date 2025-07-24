@@ -19,7 +19,7 @@ $sesionNombre = $sesi['nombre'];   // Reemplaza con el nombre exacto de la colum
 include 'db_connection.php';
 
 // Consulta base para obtener los empleados y sus áreas
-$sql = "SELECT pro.id, pro.producto, pro.costo, pro.barcode_path, cs.status
+$sql = "SELECT pro.id, pro.producto, pro.barcode, pro.costo, pro.barcode_path, cs.status
         FROM producto pro
           INNER JOIN catalog_status cs ON cs.status_id = pro.estatus
         ORDER BY pro.id";
@@ -90,6 +90,7 @@ $productos = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <tr>
                             <th>Id</th>
                             <th>Servicio</th>
+                            <th>Código</th>
                             <th>Código del producto</th>
                             <th>Estatus</th>
                             <th>Acción</th>
@@ -101,6 +102,7 @@ $productos = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 <tr>
                                     <td><?= htmlspecialchars($producto['id']) ?></td>
                                     <td><?= htmlspecialchars($producto['producto']) ?></td>
+                                    <td><?= htmlspecialchars($producto['barcode']) ?></td>
                                     <td class="text-center align-middle">
                                         <!-- Icono de imagen que abre el modal al hacer clic -->
                                         <a href="#" data-toggle="modal" data-target="#barcodeModal"
@@ -273,85 +275,85 @@ $productos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 
 
-            </div>
-            </div>
+    </div>
+</div>
 
-            <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-            <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
 
-            <script>
-                // Captura el evento de apertura del modal para cambiar la imagen según el producto
-                $('#barcodeModal').on('show.bs.modal', function(event) {
-                    var button = $(event.relatedTarget); // Elemento que activó el modal
-                    var barcodePath = button.data('barcode'); // Obtiene la ruta de la imagen del atributo data-barcode
-                    var modal = $(this);
-                    modal.find('#barcodeImage').attr('src', barcodePath); // Cambia la ruta de la imagen en el modal
-                });
-
-
-                // Función para pasar el ID del usuario al campo oculto del formulario en el modal de eliminación
-                function setUserId(id) {
-                    document.getElementById('id').value = id;
-                }
+<script>
+    // Captura el evento de apertura del modal para cambiar la imagen según el producto
+    $('#barcodeModal').on('show.bs.modal', function(event) {
+        var button = $(event.relatedTarget); // Elemento que activó el modal
+        var barcodePath = button.data('barcode'); // Obtiene la ruta de la imagen del atributo data-barcode
+        var modal = $(this);
+        modal.find('#barcodeImage').attr('src', barcodePath); // Cambia la ruta de la imagen en el modal
+    });
 
 
-                // Función para cargar la imagen y detalles del producto en el modal
-                function openBarcodeModal(barcodeSrc, productInfo) {
-                    // Configurar la fuente de la imagen del código de barras y los detalles del producto
-                    document.getElementById('barcodeImage').src = barcodeSrc;
-                    document.getElementById('productInfo').innerText = productInfo;
+    // Función para pasar el ID del usuario al campo oculto del formulario en el modal de eliminación
+    function setUserId(id) {
+        document.getElementById('id').value = id;
+    }
 
-                    // Mostrar el modal
-                    $('#barcodeModal').modal('show');
-                }
 
-                // Función para imprimir solo el contenido del código de barras y la información
-                function printBarcode() {
-                    const printContent = `
+    // Función para cargar la imagen y detalles del producto en el modal
+    function openBarcodeModal(barcodeSrc, productInfo) {
+        // Configurar la fuente de la imagen del código de barras y los detalles del producto
+        document.getElementById('barcodeImage').src = barcodeSrc;
+        document.getElementById('productInfo').innerText = productInfo;
+
+        // Mostrar el modal
+        $('#barcodeModal').modal('show');
+    }
+
+    // Función para imprimir solo el contenido del código de barras y la información
+    function printBarcode() {
+        const printContent = `
             <div style="text-align: center;">
                 <h3>${document.getElementById('productInfo').innerText}</h3>
                 ${document.getElementById('barcodeImage').outerHTML}
             </div>
         `;
 
-                    const printWindow = window.open('', '', 'height=600,width=800');
-                    printWindow.document.write('<html><head><title>Imprimir Código de Barras</title>');
-                    printWindow.document.write('<style>body { text-align: center; font-family: Arial, sans-serif; }</style>');
-                    printWindow.document.write('</head><body>');
-                    printWindow.document.write(printContent);
-                    printWindow.document.write('</body></html>');
+        const printWindow = window.open('', '', 'height=600,width=800');
+        printWindow.document.write('<html><head><title>Imprimir Código de Barras</title>');
+        printWindow.document.write('<style>body { text-align: center; font-family: Arial, sans-serif; }</style>');
+        printWindow.document.write('</head><body>');
+        printWindow.document.write(printContent);
+        printWindow.document.write('</body></html>');
 
-                    printWindow.document.close();
-                    printWindow.print();
-                }
-
-
-                // Capturar el evento de apertura del modal de edición
-                $('#editProductModal').on('show.bs.modal', function(event) {
-                    var button = $(event.relatedTarget); // Elemento que activó el modal
-                    var id = button.data('id'); // ID del producto
-                    var producto = button.data('producto'); // Nombre del producto
-             
-                    // Asignar valores a los campos del formulario en el modal
-                    $('#editProductId').val(id);
-                    $('#editProducto').val(producto);
-                });
-            </script>
+        printWindow.document.close();
+        printWindow.print();
+    }
 
 
+    // Capturar el evento de apertura del modal de edición
+    $('#editProductModal').on('show.bs.modal', function(event) {
+        var button = $(event.relatedTarget); // Elemento que activó el modal
+        var id = button.data('id'); // ID del producto
+        var producto = button.data('producto'); // Nombre del producto
+
+        // Asignar valores a los campos del formulario en el modal
+        $('#editProductId').val(id);
+        $('#editProducto').val(producto);
+    });
+</script>
 
 
 
 
 
-    </main>
-            </div>
-    <script src="node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="node_modules/chart.js/dist/chart.umd.js"></script>
-    <script src="js/sidebars.js"></script>
-    <script src="js/seguridad.js"></script>
 
-    <?php include 'footer.php'; ?>
+
+</main>
+</div>
+<script src="node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script src="node_modules/chart.js/dist/chart.umd.js"></script>
+<script src="js/sidebars.js"></script>
+<script src="js/seguridad.js"></script>
+
+<?php include 'footer.php'; ?>
 </body>
 
 </html>

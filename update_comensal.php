@@ -8,8 +8,8 @@ if (!isset($_SESSION['resultado'])) {
 } else {
     $sesi = $_SESSION['resultado'];
 }
-$sesionUsuario = $sesi['usuario']; // Reemplaza con el nombre exacto de la columna
-$sesionNombre = $sesi['nombre'];   // Reemplaza con el nombre exacto de la columna
+$sesionUsuario = $sesi['usuario'];
+$sesionNombre = $sesi['nombre'];
 
 require 'vendor/autoload.php';
 
@@ -29,10 +29,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $puesto = strtoupper($_POST['puesto']);
     $correo = strtoupper($_POST['correo']);
     $barcode = strtoupper($_POST['barcode']);
+    $t_desayuno = in_array('Desayuno', $_POST['edit_tiempos_comida'] ?? []) ? 1 : 0;
+    $t_colacion = in_array('Colación', $_POST['edit_tiempos_comida'] ?? []) ? 1 : 0;
+    $t_comida   = in_array('Comida', $_POST['edit_tiempos_comida'] ?? []) ? 1 : 0;
+    $t_cena     = in_array('Cena', $_POST['edit_tiempos_comida'] ?? []) ? 1 : 0;
 
-    $imagePath = null;
+    // Obtener la imagen actual si no se sube una nueva
+    $sql_img = "SELECT imagePath FROM comensal WHERE id = ?";
+    $stmt_img = $con->prepare($sql_img);
+    $stmt_img->bind_param("i", $id);
+    $stmt_img->execute();
+    $stmt_img->bind_result($imagePathActual);
+    $stmt_img->fetch();
+    $stmt_img->close();
 
-    // Manejar nueva foto (si existe)
+    $imagePath = $imagePathActual;
+
     if (isset($_POST['photo']) && !empty($_POST['photo'])) {
         $imageData = $_POST['photo'];
         $imageParts = explode(";base64,", $imageData);
@@ -59,7 +71,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
 
-    // Crear imagen del código de barras con texto y márgenes
     $barcodePath = 'images/barcodesComensal/' . $barcode . '.png';
     $generator = new BarcodeGeneratorPNG();
     $barcodeImage = $generator->getBarcode($barcode, $generator::TYPE_CODE_128);
@@ -68,33 +79,29 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         mkdir('images/barcodesComensal/', 0777, true);
     }
 
-    $margen = 20; // Tamaño del margen alrededor del código de barras
-    $barcodeWidth = 300; // Ancho del código de barras
-    $barcodeHeight = 50; // Alto del código de barras
-    $imageHeight = $barcodeHeight + 50; // Espacio para el texto
-    $imageWidth = $barcodeWidth + 2 * $margen; // Ancho con márgenes
-    $finalImageHeight = $imageHeight + 2 * $margen; // Altura con márgenes
+    $margen = 20;
+    $barcodeWidth = 300;
+    $barcodeHeight = 50;
+    $imageHeight = $barcodeHeight + 50;
+    $imageWidth = $barcodeWidth + 2 * $margen;
+    $finalImageHeight = $imageHeight + 2 * $margen;
 
     $finalImage = imagecreatetruecolor($imageWidth, $finalImageHeight);
     $white = imagecolorallocate($finalImage, 255, 255, 255);
     $black = imagecolorallocate($finalImage, 0, 0, 0);
 
-    // Rellenar fondo blanco
     imagefilledrectangle($finalImage, 0, 0, $imageWidth, $finalImageHeight, $white);
 
-    // Insertar el código de barras en el centro con márgenes
     $barcodeImageResource = imagecreatefromstring($barcodeImage);
-    $barcodeX = $margen; // Margen izquierdo
-    $barcodeY = $margen; // Margen superior
+    $barcodeX = $margen;
+    $barcodeY = $margen;
     imagecopy($finalImage, $barcodeImageResource, $barcodeX, $barcodeY, 0, 0, $barcodeWidth, $barcodeHeight);
 
-    // Agregar texto (número de empleado) debajo del código de barras
     $fontPath = __DIR__ . '/css/arial.ttf';
-    $textX = $margen + 10; // Posición X ajustada dentro del margen
-    $textY = $barcodeY + $barcodeHeight + 30; // Posición Y debajo del código de barras
+    $textX = $margen + 10;
+    $textY = $barcodeY + $barcodeHeight + 30;
     imagettftext($finalImage, 12, 0, $textX, $textY, $black, $fontPath, "Código del Empleado: $barcode");
 
-    // Guardar la imagen final
     if (!imagepng($finalImage, $barcodePath)) {
         echo "Error al guardar la imagen del código de barras.";
         exit();
@@ -103,28 +110,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     imagedestroy($barcodeImageResource);
     imagedestroy($finalImage);
 
-    // Asignar ruta del código de barras
     $barcode_path = $barcodePath;
 
-    // Actualizar registro con mysqli
     $sql = "UPDATE comensal 
-            SET a_paterno = ?, 
-                a_materno = ?, 
-                nombre = ?, 
-                nombre_completo = ?, 
-                num_empleado = ?, 
-                empresa = ?, 
-                departamento = ?, 
-                puesto = ?, 
-                correo = ?,
-                imagePath = ?,
-                barcode_path = ?
+            SET a_paterno = ?, a_materno = ?, nombre = ?, nombre_completo = ?, 
+                num_empleado = ?, empresa = ?, departamento = ?, puesto = ?, correo = ?,
+                imagePath = ?, barcode_path = ?,
+                t_desayuno = ?, t_colacion = ?, t_comida = ?, t_cena = ?
             WHERE id = ?";
     $stmt = $con->prepare($sql);
 
     if ($stmt) {
         $stmt->bind_param(
-            "ssssissssssi",
+            "ssssissssssiiiii",
             $a_paterno,
             $a_materno,
             $nombre,
@@ -136,6 +134,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $correo,
             $imagePath,
             $barcode_path,
+            $t_desayuno,
+            $t_colacion,
+            $t_comida,
+            $t_cena,
             $id
         );
 
@@ -153,18 +155,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                     $mail->setFrom('apps-zumpango@igsamedical.com', 'SISTEMA CONTROL DE ALIMENTOS');
                     $mail->addAddress($correo);
-
                     $mail->isHTML(true);
-                    $mail->Subject = 'Codigo de Barras - Sistema Control de Alimentos';
-                    $mail->Body = "
-                                    <h1>Bienvenido al Sistema de Comedor</h1>
-                                    <p>Estimado(a) $nombre_completo,</p>
-                                    <p>Gracias por actualizar tu información en nuestro sistema. Por este medio, se ha generado y compartido tu código de barras personal.</p>
-                                    <p>Este código será necesario para ingresar al comedor y realizar tu checklist correspondiente.</p>
-                                    <p>Si tienes alguna duda, no dudes en contactarnos.</p>
-                                    <p>Atentamente,</p>
-                                    <p><strong>Sistema de Control de Alimentos</strong></p>
-                                ";
+                    $mail->CharSet = 'UTF-8';
+                    $mail->Encoding = 'base64';
+                    $mail->Subject = 'Registro exitoso - Sistema Control de Alimentos';
+                    $mail->Body = "<h1>Bienvenido al Sistema de Comedor</h1>
+                        <p>Estimado(a) $nombre_completo,</p>
+                        <p>Gracias por actualizar tu información en nuestro sistema. Por este medio, se ha generado y compartido tu código de barras personal.</p>
+                        <p>Este código será necesario para ingresar al comedor y realizar tu checklist correspondiente.</p>
+                        <p>Si tienes alguna duda, no dudes en contactarnos.</p>
+                         <p>Consulta nuestro <a href='https://igsa1-my.sharepoint.com/:b:/g/personal/apps-zumpango_igsamedical_com/EfmeKXrrAxFEoyMPPyIunVgBZ-2YdTVkg1WYTWzuxg22mA?e=ho0DsW' target='_blank'>Aviso de Privacidad</a>.</p>
+    <br>
+                        <p>Atentamente,</p>
+                        <p><strong>Sistema de Control de Alimentos</strong></p>";
 
                     $mail->addAttachment($barcodePath);
                     $mail->send();
