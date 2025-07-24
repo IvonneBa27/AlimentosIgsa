@@ -35,28 +35,35 @@ $page = isset($_GET['page']) ? $_GET['page'] : 1;
 $start_from = ($page - 1) * $results_per_page;
 
 // Modificar la consulta para limitar los resultados
-/*$consulta = "SELECT * FROM dietas WHERE area = 'GINECOLOGÍA' AND DATE (Fecha_Hora_Creacion) = '$fechaFiltro' 
-ORDER BY ID DESC LIMIT $start_from, $results_per_page";*/
-$consulta = "SELECT * FROM dietas p WHERE area = 'GINECOLOGÍA' AND DATE (Fecha_Hora_Creacion) = '$fechaFiltro' 
+$consulta = "SELECT p.* 
+FROM dietas p
+JOIN pacientes pa ON p.idPaciente = pa.idPaciente
+WHERE p.area = 'GINECOLOGÍA' 
+  AND DATE(p.Fecha_Hora_Creacion) = '$fechaFiltro'
+  AND pa.statusP = 'Activo'
 ORDER BY 
-CASE 
-WHEN p.Cama_Paciente LIKE 'AA-%' THEN 1
-ELSE 2
-END,
-CAST(
-CASE 
-WHEN p.Cama_Paciente LIKE '%-%' THEN SUBSTRING_INDEX(p.Cama_Paciente, '-', -1)
-ELSE p.Cama_Paciente
-END AS UNSIGNED
-) LIMIT $start_from, $results_per_page";
+  CASE 
+    WHEN p.Cama_Paciente LIKE 'AA-%' THEN 1
+    ELSE 2
+  END,
+  CAST(
+    CASE 
+      WHEN p.Cama_Paciente LIKE '%-%' THEN SUBSTRING_INDEX(p.Cama_Paciente, '-', -1)
+      ELSE p.Cama_Paciente
+    END AS UNSIGNED
+  )
+LIMIT $start_from, $results_per_page";
+
 
 $query = mysqli_query($con, $consulta);
 
 
 
 
-$pacientes = "SELECT * FROM pacientes WHERE area = 'GINECOLOGÍA'";
+$pacientes = "SELECT * FROM pacientes WHERE area = 'GINECOLOGÍA' AND statusP = 'Activo'";
 $ejecutar = mysqli_query($con, $pacientes);
+
+
 ?>
 
 
@@ -123,7 +130,7 @@ $ejecutar = mysqli_query($con, $pacientes);
                 </div>
             </div>
 
-            <canvas class="my-4 w-100" id="myChart" width="900" height="200"></canvas>
+            <canvas class="my-4 w-100" id="myChart" width="900" height="120"></canvas>
 
             <h4>Dietas Solicitadas</h4>
             <div class="pagination">
@@ -334,6 +341,7 @@ $ejecutar = mysqli_query($con, $pacientes);
     <script type="text/javascript" src="node_modules/jquery/dist/jquery.min.js"></script>
     <script src="js/nota.js"></script>
     <script src="js/impresionG.js"></script>
+    <script src="js/seguridad.js"></script>
 
     <?php include 'footer.php'; ?>
 </body>

@@ -69,42 +69,42 @@ function guardarOActualizarDieta($idPaciente, $datos, $rangoHoraActual)
         // Dependiendo del rango de hora actual, realizar la consulta correspondiente
         if ($rangoHoraActual == 'Desayuno') {
             $insert = "INSERT INTO updatedesayunos (ID, idDieta, IdPaciente, fechaHora, Desayuno, area, modificadoPor) 
-                       VALUES ('', '$idDieta', '$idPaciente', '$fechaHoraActual', '$desayuno', '$area', '$usuario')";
+                       VALUES ('', '$idDieta', '$idPaciente', '$fechaHoraActual', '$desayuno', 'UTIP', '$usuario')";
             mysqli_query($con, $insert);
             $sqlUpdate = "UPDATE dietas SET Nombre_Paciente = '$nombre', Fecha_Nacimiento_Paciente = '$fechaNacimiento', Cama_Paciente = '$cama', Edad = '$edad', Diag_Med_Nutri = '$diagnosticoMed', Prescripcion = '$prescripcionNutri', Desayuno = '$desayuno', Col_Matutina = '$colMatutina', Comida = '$comida', Col_Vespertina = '$colVespertina', Cena = '$cena', Col_Nocturna = '$colNocturna', Observaciones = '$observaciones', Control_Tamizaje = '$controlTamizaje', privados = '$vip', Fecha_Hora_Creacion = '$fechaHoraActual', Creado_por = '$usuario' WHERE idPaciente = '$idPaciente' AND DATE(Fecha_Hora_Creacion) = '$fechaHoy'";
             mysqli_query($con, $sqlUpdate);
         } elseif ($rangoHoraActual == 'Col_Matutina') {
             // Realizar la consulta correspondiente a Col_Matutina
             $insert = "INSERT INTO updatecol_matutina (ID, idDieta, IdPaciente, fechaHora, Col_Matutina, area, modificadoPor) 
-            VALUES ('', '$idDieta', '$idPaciente', '$fechaHoraActual', '$colMatutina', '$area', '$usuario')";
+            VALUES ('', '$idDieta', '$idPaciente', '$fechaHoraActual', '$colMatutina', 'UTIP', '$usuario')";
             mysqli_query($con, $insert);
             $sqlUpdate = "UPDATE dietas SET Nombre_Paciente = '$nombre', Fecha_Nacimiento_Paciente = '$fechaNacimiento', Cama_Paciente = '$cama', Edad = '$edad', Diag_Med_Nutri = '$diagnosticoMed', Prescripcion = '$prescripcionNutri', Desayuno = '$desayuno', Col_Matutina = '$colMatutina', Comida = '$comida', Col_Vespertina = '$colVespertina', Cena = '$cena', Col_Nocturna = '$colNocturna', Observaciones = '$observaciones', Control_Tamizaje = '$controlTamizaje', privados = '$vip', Fecha_Hora_Creacion = '$fechaHoraActual', Creado_por = '$usuario' WHERE idPaciente = '$idPaciente' AND DATE(Fecha_Hora_Creacion) = '$fechaHoy'";
             mysqli_query($con, $sqlUpdate);
         } elseif ($rangoHoraActual == 'Comida') {
             // Realizar la consulta correspondiente a Comida
             $insert = "INSERT INTO updatecomida (ID, idDieta, IdPaciente, fechaHora, Comida, area, modificadoPor) 
-            VALUES ('', '$idDieta', '$idPaciente', '$fechaHoraActual', '$comida', '$area', '$usuario')";
+            VALUES ('', '$idDieta', '$idPaciente', '$fechaHoraActual', '$comida', 'UTIP', '$usuario')";
             mysqli_query($con, $insert);
             $sqlUpdate = "UPDATE dietas SET Nombre_Paciente = '$nombre', Fecha_Nacimiento_Paciente = '$fechaNacimiento', Cama_Paciente = '$cama', Edad = '$edad', Diag_Med_Nutri = '$diagnosticoMed', Prescripcion = '$prescripcionNutri', Desayuno = '$desayuno', Col_Matutina = '$colMatutina', Comida = '$comida', Col_Vespertina = '$colVespertina', Cena = '$cena', Col_Nocturna = '$colNocturna', Observaciones = '$observaciones', Control_Tamizaje = '$controlTamizaje', privados = '$vip', Fecha_Hora_Creacion = '$fechaHoraActual', Creado_por = '$usuario' WHERE idPaciente = '$idPaciente' AND DATE(Fecha_Hora_Creacion) = '$fechaHoy'";
             mysqli_query($con, $sqlUpdate);
         } elseif ($rangoHoraActual == 'Col_Vespertina') {
             // Realizar la consulta correspondiente a Col_Vespertina
             $insert = "INSERT INTO updatecol_vespertina (ID, idDieta, IdPaciente, fechaHora, Col_Vespertina, area, modificadoPor) 
-            VALUES ('', '$idDieta', '$idPaciente', '$fechaHoraActual', '$colVespertina', '$area', '$usuario')";
+            VALUES ('', '$idDieta', '$idPaciente', '$fechaHoraActual', '$colVespertina', 'UTIP', '$usuario')";
             mysqli_query($con, $insert);
             $sqlUpdate = "UPDATE dietas SET Nombre_Paciente = '$nombre', Fecha_Nacimiento_Paciente = '$fechaNacimiento', Cama_Paciente = '$cama', Edad = '$edad', Diag_Med_Nutri = '$diagnosticoMed', Prescripcion = '$prescripcionNutri', Desayuno = '$desayuno', Col_Matutina = '$colMatutina', Comida = '$comida', Col_Vespertina = '$colVespertina', Cena = '$cena', Col_Nocturna = '$colNocturna', Observaciones = '$observaciones', Control_Tamizaje = '$controlTamizaje', privados = '$vip', Fecha_Hora_Creacion = '$fechaHoraActual', Creado_por = '$usuario' WHERE idPaciente = '$idPaciente' AND DATE(Fecha_Hora_Creacion) = '$fechaHoy'";
             mysqli_query($con, $sqlUpdate);
         } elseif ($rangoHoraActual == 'Cena') {
             // Realizar la consulta correspondiente a Cena
             $insert = "INSERT INTO updatecena (ID, idDieta, IdPaciente, fechaHora, Cena, area, modificadoPor) 
-            VALUES ('', '$idDieta', '$idPaciente', '$fechaHoraActual', '$cena', '$area', '$usuario')";
+            VALUES ('', '$idDieta', '$idPaciente', '$fechaHoraActual', '$cena', 'UTIP', '$usuario')";
             mysqli_query($con, $insert);
             $sqlUpdate = "UPDATE dietas SET Nombre_Paciente = '$nombre', Fecha_Nacimiento_Paciente = '$fechaNacimiento', Cama_Paciente = '$cama', Edad = '$edad', Diag_Med_Nutri = '$diagnosticoMed', Prescripcion = '$prescripcionNutri', Desayuno = '$desayuno', Col_Matutina = '$colMatutina', Comida = '$comida', Col_Vespertina = '$colVespertina', Cena = '$cena', Col_Nocturna = '$colNocturna', Observaciones = '$observaciones', Control_Tamizaje = '$controlTamizaje', privados = '$vip', Fecha_Hora_Creacion = '$fechaHoraActual', Creado_por = '$usuario' WHERE idPaciente = '$idPaciente' AND DATE(Fecha_Hora_Creacion) = '$fechaHoy'";
             mysqli_query($con, $sqlUpdate);
         } elseif ($rangoHoraActual == 'Col_Nocturna') {
             // Realizar la consulta correspondiente a Col_Nocturna
             $insert = "INSERT INTO updatecol_nocturna (ID, idDieta, IdPaciente, fechaHora, Col_Nocturna, area, modificadoPor) 
-            VALUES ('', '$idDieta', '$idPaciente', '$fechaHoraActual', '$colNocturna', '$area', '$usuario')";
+            VALUES ('', '$idDieta', '$idPaciente', '$fechaHoraActual', '$colNocturna', 'UTIP', '$usuario')";
             mysqli_query($con, $insert);
             $sqlUpdate = "UPDATE dietas SET Nombre_Paciente = '$nombre', Fecha_Nacimiento_Paciente = '$fechaNacimiento', Cama_Paciente = '$cama', Edad = '$edad', Diag_Med_Nutri = '$diagnosticoMed', Prescripcion = '$prescripcionNutri', Desayuno = '$desayuno', Col_Matutina = '$colMatutina', Comida = '$comida', Col_Vespertina = '$colVespertina', Cena = '$cena', Col_Nocturna = '$colNocturna', Observaciones = '$observaciones', Control_Tamizaje = '$controlTamizaje', privados = '$vip', Fecha_Hora_Creacion = '$fechaHoraActual', Creado_por = '$usuario' WHERE idPaciente = '$idPaciente' AND DATE(Fecha_Hora_Creacion) = '$fechaHoy'";
             mysqli_query($con, $sqlUpdate);
@@ -128,10 +128,102 @@ function guardarOActualizarDieta($idPaciente, $datos, $rangoHoraActual)
         $vip = $datos['vip'];
         $usuario = $datos['usuario'];
 
-        $sqlInsert = "INSERT INTO dietas 
+        if ($rangoHoraActual == 'Desayuno') {
+
+            $sqlInsert = "INSERT INTO dietas 
                (ID, Nombre_Paciente, Fecha_Nacimiento_Paciente, idPaciente, Cama_Paciente, Edad, Diag_Med_Nutri, Prescripcion, Desayuno, Col_Matutina, Comida, Col_Vespertina, Cena, Col_Nocturna, Observaciones, Control_Tamizaje, area, privados, Fecha_Hora_Creacion, Creado_por) 
-        VALUES ('', '$nombre', '$fechaNacimiento','$idPaciente', '$cama', '$edad', '$diagnosticoMed', '$prescripcionNutri', '$desayuno', '$colMatutina', '$comida', '$colVespertina', '$cena', '$colNocturna', '$observaciones', '$controlTamizaje', 'UTIP', '$vip', '$fechaHoraActual', '$usuario')";
-        mysqli_query($con, $sqlInsert);
+        VALUES ('', '$nombre', '$fechaNacimiento','$idPaciente', '$cama', '$edad', '$diagnosticoMed', '$prescripcionNutri', '$desayuno', '', '', '', '', '', '$observaciones', '$controlTamizaje', 'UTIP', '$vip', '$fechaHoraActual', '$usuario')";
+            mysqli_query($con, $sqlInsert);
+
+            $fechaHoy1 = date("Y-m-d");
+            $obtenerIdDieta = "SELECT * FROM dietas WHERE idPaciente = '$idPaciente' AND DATE(Fecha_Hora_Creacion) = '$fechaHoy1'";
+            $queryDietas = mysqli_query($con, $obtenerIdDieta);
+            $result = mysqli_fetch_assoc($queryDietas);
+            $idDieta = $result['ID'];
+
+            $insert = "INSERT INTO updatedesayunos (ID, idDieta, IdPaciente, fechaHora, Desayuno, area, modificadoPor) 
+                       VALUES ('', '$idDieta', '$idPaciente', '$fechaHoraActual', '$desayuno', 'UTIP', '$usuario')";
+            mysqli_query($con, $insert);
+        } elseif ($rangoHoraActual == 'Col_Matutina') {
+
+            $sqlInsert = "INSERT INTO dietas 
+               (ID, Nombre_Paciente, Fecha_Nacimiento_Paciente, idPaciente, Cama_Paciente, Edad, Diag_Med_Nutri, Prescripcion, Desayuno, Col_Matutina, Comida, Col_Vespertina, Cena, Col_Nocturna, Observaciones, Control_Tamizaje, area, privados, Fecha_Hora_Creacion, Creado_por) 
+        VALUES ('', '$nombre', '$fechaNacimiento','$idPaciente', '$cama', '$edad', '$diagnosticoMed', '$prescripcionNutri', '', '$colMatutina', '', '', '', '', '$observaciones', '$controlTamizaje', 'UTIP', '$vip', '$fechaHoraActual', '$usuario')";
+            mysqli_query($con, $sqlInsert);
+
+            $fechaHoy1 = date("Y-m-d");
+            $obtenerIdDieta = "SELECT * FROM dietas WHERE idPaciente = '$idPaciente' AND DATE(Fecha_Hora_Creacion) = '$fechaHoy1'";
+            $queryDietas = mysqli_query($con, $obtenerIdDieta);
+            $result = mysqli_fetch_assoc($queryDietas);
+            $idDieta = $result['ID'];
+
+            $insert = "INSERT INTO updatecol_matutina (ID, idDieta, IdPaciente, fechaHora, Col_Matutina, area, modificadoPor) 
+            VALUES ('', '$idDieta', '$idPaciente', '$fechaHoraActual', '$colMatutina', 'UTIP', '$usuario')";
+            mysqli_query($con, $insert);
+        } elseif ($rangoHoraActual == 'Comida') {
+
+            $sqlInsert = "INSERT INTO dietas 
+               (ID, Nombre_Paciente, Fecha_Nacimiento_Paciente, idPaciente, Cama_Paciente, Edad, Diag_Med_Nutri, Prescripcion, Desayuno, Col_Matutina, Comida, Col_Vespertina, Cena, Col_Nocturna, Observaciones, Control_Tamizaje, area, privados, Fecha_Hora_Creacion, Creado_por) 
+        VALUES ('', '$nombre', '$fechaNacimiento','$idPaciente', '$cama', '$edad', '$diagnosticoMed', '$prescripcionNutri', '', '', '$comida', '', '', '', '$observaciones', '$controlTamizaje', 'UTIP', '$vip', '$fechaHoraActual', '$usuario')";
+            mysqli_query($con, $sqlInsert);
+
+            $fechaHoy1 = date("Y-m-d");
+            $obtenerIdDieta = "SELECT * FROM dietas WHERE idPaciente = '$idPaciente' AND DATE(Fecha_Hora_Creacion) = '$fechaHoy1'";
+            $queryDietas = mysqli_query($con, $obtenerIdDieta);
+            $result = mysqli_fetch_assoc($queryDietas);
+            $idDieta = $result['ID'];
+
+            $insert = "INSERT INTO updatecomida (ID, idDieta, IdPaciente, fechaHora, Comida, area, modificadoPor) 
+            VALUES ('', '$idDieta', '$idPaciente', '$fechaHoraActual', '$comida', 'UTIP', '$usuario')";
+            mysqli_query($con, $insert);
+        } elseif ($rangoHoraActual == 'Col_Vespertina') {
+
+            $sqlInsert = "INSERT INTO dietas 
+               (ID, Nombre_Paciente, Fecha_Nacimiento_Paciente, idPaciente, Cama_Paciente, Edad, Diag_Med_Nutri, Prescripcion, Desayuno, Col_Matutina, Comida, Col_Vespertina, Cena, Col_Nocturna, Observaciones, Control_Tamizaje, area, privados, Fecha_Hora_Creacion, Creado_por) 
+        VALUES ('', '$nombre', '$fechaNacimiento','$idPaciente', '$cama', '$edad', '$diagnosticoMed', '$prescripcionNutri', '', '', '', '$colVespertina', '', '', '$observaciones', '$controlTamizaje', 'UTIP', '$vip', '$fechaHoraActual', '$usuario')";
+            mysqli_query($con, $sqlInsert);
+
+            $fechaHoy1 = date("Y-m-d");
+            $obtenerIdDieta = "SELECT * FROM dietas WHERE idPaciente = '$idPaciente' AND DATE(Fecha_Hora_Creacion) = '$fechaHoy1'";
+            $queryDietas = mysqli_query($con, $obtenerIdDieta);
+            $result = mysqli_fetch_assoc($queryDietas);
+            $idDieta = $result['ID'];
+
+            $insert = "INSERT INTO updatecol_vespertina (ID, idDieta, IdPaciente, fechaHora, Col_Vespertina, area, modificadoPor) 
+            VALUES ('', '$idDieta', '$idPaciente', '$fechaHoraActual', '$colVespertina', 'UTIP', '$usuario')";
+            mysqli_query($con, $insert);
+        } elseif ($rangoHoraActual == 'Cena') {
+
+            $sqlInsert = "INSERT INTO dietas 
+               (ID, Nombre_Paciente, Fecha_Nacimiento_Paciente, idPaciente, Cama_Paciente, Edad, Diag_Med_Nutri, Prescripcion, Desayuno, Col_Matutina, Comida, Col_Vespertina, Cena, Col_Nocturna, Observaciones, Control_Tamizaje, area, privados, Fecha_Hora_Creacion, Creado_por) 
+        VALUES ('', '$nombre', '$fechaNacimiento','$idPaciente', '$cama', '$edad', '$diagnosticoMed', '$prescripcionNutri', '', '', '', '', '$cena', '', '$observaciones', '$controlTamizaje', 'UTIP', '$vip', '$fechaHoraActual', '$usuario')";
+            mysqli_query($con, $sqlInsert);
+
+            $fechaHoy1 = date("Y-m-d");
+            $obtenerIdDieta = "SELECT * FROM dietas WHERE idPaciente = '$idPaciente' AND DATE(Fecha_Hora_Creacion) = '$fechaHoy1'";
+            $queryDietas = mysqli_query($con, $obtenerIdDieta);
+            $result = mysqli_fetch_assoc($queryDietas);
+            $idDieta = $result['ID'];
+
+            $insert = "INSERT INTO updatecena (ID, idDieta, IdPaciente, fechaHora, Cena, area, modificadoPor) 
+            VALUES ('', '$idDieta', '$idPaciente', '$fechaHoraActual', '$cena', 'UTIP', '$usuario')";
+            mysqli_query($con, $insert);
+        } elseif ($rangoHoraActual == 'Col_Nocturna') {
+            $sqlInsert = "INSERT INTO dietas 
+               (ID, Nombre_Paciente, Fecha_Nacimiento_Paciente, idPaciente, Cama_Paciente, Edad, Diag_Med_Nutri, Prescripcion, Desayuno, Col_Matutina, Comida, Col_Vespertina, Cena, Col_Nocturna, Observaciones, Control_Tamizaje, area, privados, Fecha_Hora_Creacion, Creado_por) 
+        VALUES ('', '$nombre', '$fechaNacimiento','$idPaciente', '$cama', '$edad', '$diagnosticoMed', '$prescripcionNutri', '', '', '', '', '', '$colNocturna', '$observaciones', '$controlTamizaje', 'UTIP', '$vip', '$fechaHoraActual', '$usuario')";
+            mysqli_query($con, $sqlInsert);
+
+            $fechaHoy1 = date("Y-m-d");
+            $obtenerIdDieta = "SELECT * FROM dietas WHERE idPaciente = '$idPaciente' AND DATE(Fecha_Hora_Creacion) = '$fechaHoy1'";
+            $queryDietas = mysqli_query($con, $obtenerIdDieta);
+            $result = mysqli_fetch_assoc($queryDietas);
+            $idDieta = $result['ID'];
+
+            $insert = "INSERT INTO updatecol_nocturna (ID, idDieta, IdPaciente, fechaHora, Col_Nocturna, area, modificadoPor) 
+            VALUES ('', '$idDieta', '$idPaciente', '$fechaHoraActual', '$colNocturna', 'UTIP', '$usuario')";
+            mysqli_query($con, $insert);
+        }
     }
 }
 
@@ -146,7 +238,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     exit;
 }
 
-
+$fechaHoraActual1 = date("Y-m-d");
 $sql = "SELECT p.*, d.*, p.idPaciente AS pacienteID, d.idPaciente AS dietaID
 FROM pacientes p
 LEFT JOIN (
@@ -155,7 +247,7 @@ LEFT JOIN (
     INNER JOIN (
         SELECT MAX(ID) AS ID, idPaciente
         FROM dietas
-        WHERE area = 'UTIP'
+        WHERE area = 'UTIP' AND DATE(Fecha_Hora_Creacion) = '$fechaHoraActual1'
         GROUP BY idPaciente
     ) d2 ON d1.ID = d2.ID
 ) d ON p.idPaciente = d.idPaciente
@@ -287,7 +379,7 @@ if ($query->num_rows > 0) {
                     <div class="mx-auto col-md-12 col-lg-12 ">
                         <h1 class="mb-3"></h1>
                         <div class="row g-3">
-                            <div class="table-responsive" style="max-height: 830px; overflow-y: auto;">
+                            <div id="contenedorScroll" class="table-responsive" style="max-height: 830px; overflow-y: auto;">
                                 <table id="miTabla" class="table table-light table-sm table-striped table-bordered">
                                     <thead>
                                         <tr style="border: none;">
@@ -340,7 +432,7 @@ if ($query->num_rows > 0) {
                                     <tbody>
                                         <?php foreach ($datosCombinados as $dataRow) { ?>
                                             <tr>
-                                                <td scope="col"><input type="checkbox" onclick="toggleEdit(this)"></td>
+                                                <td scope="col"><input type="checkbox" class="form-check-input custom-checkbox" style="width: 20px; height: 20px;" onclick="toggleEdit(this)"></td>
                                                 <td class="text-center" data-campo="nombre"><?php echo $dataRow["nombre"]; ?></td>
                                                 <td class="text-center" data-campo="fechaNacimiento"><?php echo $dataRow["fechaNacimiento"]; ?></td>
                                                 <td class="text-center" data-campo="idPaciente"><?php echo $dataRow["pacienteID"]; ?></td>
@@ -389,7 +481,7 @@ if ($query->num_rows > 0) {
 
                                 <div class="form-group col-md-9">
                                     <label class="fs-4">Nombre del Paciente</label>
-                                    <input type="text" class="form-control fs-4" id="nombrePaciente" name="nombrePaciente" required>
+                                    <input type="text" class="form-control fs-4" id="nombrePaciente" name="nombrePaciente" style="text-transform: uppercase;" required>
                                 </div>
 
                                 <div class="form-group col-md-9">
@@ -406,11 +498,27 @@ if ($query->num_rows > 0) {
                                     <label class="fs-5">Cama</label>
                                     <select name="cama" id="cama" class="form-control fs-5" required>
                                         <?php
-                                        $sqlCama = "SELECT numero FROM camas WHERE area = 'UTIP'";
+                                        // Consulta para obtener las camas disponibles
+                                        $sqlCama = "
+                                        SELECT numero 
+                                        FROM camas 
+                                        WHERE area = 'UTIP' 
+                                        AND numero NOT IN (
+                                            SELECT cama 
+                                            FROM pacientes 
+                                            WHERE area = 'UTIP' 
+                                            AND statusP = 'Activo'
+                                        )
+                                    ";
                                         $queryCama = mysqli_query($con, $sqlCama);
 
-                                        while ($row = mysqli_fetch_assoc($queryCama)) {
-                                            echo '<option value="' . $row['numero'] . '">' . $row['numero'] . '</option>';
+                                        if (mysqli_num_rows($queryCama) > 0) {
+                                            echo '<option value="">Seleccione una cama</option>';
+                                            while ($row = mysqli_fetch_assoc($queryCama)) {
+                                                echo '<option value="' . $row['numero'] . '">' . $row['numero'] . '</option>';
+                                            }
+                                        } else {
+                                            echo '<option value="">No hay camas disponibles</option>';
                                         }
                                         ?>
                                     </select>
@@ -429,12 +537,12 @@ if ($query->num_rows > 0) {
 
                                 <div class="form-group col-md-9">
                                     <label class="fs-5">Diagnostico Médico y Nutricional</label>
-                                    <textarea class="form-control fs-5" aria-label="With textarea" id="diagMed" required></textarea>
+                                    <textarea class="form-control fs-5" aria-label="With textarea" id="diagMed" style="text-transform: uppercase;" required></textarea>
                                 </div>
 
                                 <div class="form-group col-md-9">
                                     <label class="fs-5">Prescripción Nutricional</label>
-                                    <textarea class="form-control fs-5" aria-label="With textarea" id="presNutri" required></textarea>
+                                    <textarea class="form-control fs-5" aria-label="With textarea" id="presNutri" style="text-transform: uppercase;" required></textarea>
                                 </div>
 
                                 <div class="form-group col-md-9">
@@ -448,12 +556,12 @@ if ($query->num_rows > 0) {
 
                                 <div class="form-group col-md-9">
                                     <label class="fs-5">Observaciones</label>
-                                    <textarea class="form-control fs-5" aria-label="With textarea" id="observaciones" required></textarea>
+                                    <textarea class="form-control fs-5" aria-label="With textarea" id="observaciones" style="text-transform: uppercase;" required></textarea>
                                 </div>
 
                                 <div class="form-group col-md-9">
                                     <label class="fs-5">Control de Tamizaje</label>
-                                    <textarea class="form-control fs-5" aria-label="With textarea" id="controlTami" required></textarea>
+                                    <textarea class="form-control fs-5" aria-label="With textarea" id="controlTami" style="text-transform: uppercase;" required></textarea>
                                 </div>
 
                                 <div class="form-group col-md-9" hidden>

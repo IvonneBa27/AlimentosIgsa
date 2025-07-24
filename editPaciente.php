@@ -15,13 +15,48 @@ $sesionNombre = $sesi['nombre'];   // Reemplaza con el nombre exacto de la colum
 $id = $_GET["id"];
 
 // Consulta SQL para obtener los datos de los pacientes
+$sql1 = "SELECT * FROM pacientes WHERE id = '$id'";
+$query1 = mysqli_query($con, $sql1);
+
+if ($query1 && mysqli_num_rows($query1) > 0) {
+    $datosP = mysqli_fetch_assoc($query1);
+    $area = mysqli_real_escape_string($con, $datosP['area']); // Escapa el valor del área
+
+    $sqlCamas = "
+    SELECT numero 
+    FROM camas 
+    WHERE area = '$area' 
+    AND (
+        numero NOT IN (
+            SELECT cama 
+            FROM pacientes 
+            WHERE area = '$area' 
+            AND statusP = 'Activo'
+        )
+        OR numero = '{$datosP['cama']}'
+    )";
+
+    $queryCamas = mysqli_query($con, $sqlCamas);
+
+    $datosC = []; // Arreglo para almacenar los números de cama
+
+    if ($queryCamas && mysqli_num_rows($queryCamas) > 0) {
+        while ($fila = mysqli_fetch_assoc($queryCamas)) {
+            $datosC[] = $fila['numero'];
+        }
+    } else {
+        echo "No se encontraron camas para el área: $area";
+    }
+} else {
+    echo "No se encontró el paciente con ID: $id";
+}
+
 $sql = "SELECT * FROM pacientes WHERE id = '$id'";
 $query = mysqli_query($con, $sql);
 
-
 $vipOptions = ["APLICA", "N/A"];
 $statusOptions = ["Activo", "Inactivo"];
-$areaOptions = ["CIRUGÍA GENERAL", "MEDICINA INTERNA", "GINECOLOGÍA", "PEDIATRÍA", "PRIVADOS", "QUEMADOS", "UTIP", "UCIA"];
+$areaOptions = ["CIRUGÍA GENERAL", "MEDICINA INTERNA", "GINECOLOGÍA", "PEDIATRÍA", "LACTANTES", "PRIVADOS", "QUEMADOS", "UTIP", "UCIA"];
 
 ?>
 
@@ -64,16 +99,10 @@ $areaOptions = ["CIRUGÍA GENERAL", "MEDICINA INTERNA", "GINECOLOGÍA", "PEDIATR
                 <div class="btn-toolbar mb-2 mb-md-0">
 
                     <div class="btn-group me-2">
-                        <!--<button type="button" class="btn btn-sm btn-outline-secondary" onclick="openModal();">
-                            <i class="bi bi-person-plus"></i> Agregar Paciente
-                        </button>-->
                     </div>
 
                     <form method="post" action="pdfCG.php" target="_blank">
                         <div class="btn-group me-2">
-                            <!--<input type="hidden" name="fechaFiltro" value="<?php //echo isset($_GET['fechaFiltro']) ? $_GET['fechaFiltro'] : $fechaHoraActual; 
-                                                                                ?>">-->
-                            <!--<button type="submit" class="btn btn-sm btn-outline-secondary"><i class="bi bi-filetype-pdf"></i> Exportar</button>-->
                         </div>
                     </form>
 
@@ -130,7 +159,12 @@ $areaOptions = ["CIRUGÍA GENERAL", "MEDICINA INTERNA", "GINECOLOGÍA", "PEDIATR
 
                                                 <td class="text-center" data-campo="cama">
                                                     <select name="cama" id="camaSelect" class="form-control-plaintext">
-                                                        <option value="<?php echo $dataRow["cama"]; ?>"><?php echo $dataRow["cama"]; ?></option>
+                                                        <option value="">Seleccione una cama</option>
+                                                        <?php foreach ($datosC as $numeroCama): ?>
+                                                            <option value="<?php echo $numeroCama; ?>" <?php echo ($numeroCama == $dataRow['cama']) ? 'selected' : ''; ?>>
+                                                                <?php echo $numeroCama; ?>
+                                                            </option>
+                                                        <?php endforeach; ?>
                                                     </select>
                                                 </td>
 
@@ -199,133 +233,7 @@ $areaOptions = ["CIRUGÍA GENERAL", "MEDICINA INTERNA", "GINECOLOGÍA", "PEDIATR
                 </div>
             </div>
 
-
-            <div class="modal" id="myModal">
-                <div class="modal-dialog modal-lg modal-dialog-scrollable" role="document">
-                    <div class="modal-content">
-                        <div class="modal-body">
-                            <form class="row g-3 needs-validation" method="POST" action="" id="myFormAddPaciente">
-                                <div class="modal-header">
-                                    <h4 class="text-center fs-2 col-md-11">Datos del Paciente</h4>
-                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="CerrarModal()">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                </div>
-
-                                <div class="form-group col-md-9">
-                                    <label class="fs-4">Nombre del Paciente</label>
-                                    <input type="text" class="form-control fs-4" id="nombrePaciente" name="nombrePaciente" required>
-                                </div>
-
-                                <div class="form-group col-md-9">
-                                    <label class="fs-5">Fecha de Nacimiento</label>
-                                    <input type="date" class="form-control fs-5" id="fechaNac" name="fechaNac" required>
-                                </div>
-
-                                <div class="form-group col-md-9">
-                                    <label class="fs-5">ID</label>
-                                    <input type="number" class="form-control fs-5" id="idPaciente" name="idPaciente" required>
-                                </div>
-
-                                <div class="form-group col-md-9">
-                                    <label class="fs-5">Cama</label>
-                                    <input type="text" class="form-control fs-5" id="cama" required>
-                                </div>
-
-                                <div class="form-group col-md-9">
-                                    <label class="fs-5">Edad</label>
-                                    <input type="text" class="form-control fs-5" id="edad" required>
-                                </div>
-
-                                <div class="form-group col-md-9">
-                                    <label class="fs-5">Diagnostico Médico y Nutricional</label>
-                                    <textarea class="form-control fs-5" aria-label="With textarea" id="diagMed" required></textarea>
-                                </div>
-
-                                <div class="form-group col-md-9">
-                                    <label class="fs-5">Prescripción Nutricional</label>
-                                    <textarea class="form-control fs-5" aria-label="With textarea" id="presNutri" required></textarea>
-                                </div>
-
-                                <div class="form-group col-md-9">
-                                    <label class="fs-5">Área</label>
-                                    <select name="area" id="area" class="form-control fs-5" required>
-                                        <option value="">Elegir área..</option>
-                                        <option value="CIRUGÍA GENERAL">CIRUGÍA GENERAL</option>
-                                        <option value="MEDICINA INTERNA">MEDICINA INTERNA</option>
-                                        <option value="GINECOLOGÍA Y PEDIATRÍA">GINECOLOGÍA Y PEDIATRÍA</option>
-                                        <option value="UTIP">UTIP</option>
-                                        <option value="UCIQUEMADOS">UCIQUEMADOS</option>
-                                        <option value="UCIA">UCIA</option>
-                                    </select>
-                                </div>
-
-                                <div class="form-group col-md-9">
-                                    <label class="fs-5">VIP</label>
-                                    <select name="vip" id="vip" class="form-control fs-5" required>
-                                        <option value="">Elegir opción...</option>
-                                        <option value="APLICA">APLICA</option>
-                                        <option value="N/A">N/A</option>
-                                    </select>
-                                </div>
-
-                                <div class="form-group col-md-9">
-                                    <label class="fs-5">Observaciones</label>
-                                    <textarea class="form-control fs-5" aria-label="With textarea" id="observaciones" required></textarea>
-                                </div>
-
-                                <div class="form-group col-md-9">
-                                    <label class="fs-5">Control de Tamizaje</label>
-                                    <textarea class="form-control fs-5" aria-label="With textarea" id="controlTami" required></textarea>
-                                </div>
-
-                                <div class="form-group col-md-9" hidden>
-                                    <label class="fs-4">Usuario</label>
-                                    <input type="text" class="form-control fs-4" id="nombreUsuario" value="<?php echo $sesionNombre ?>" required>
-                                </div>
-
-                                <div class="form-group col-md-9" hidden>
-                                    <label class="fs-4">status</label>
-                                    <input type="text" class="form-control fs-4" id="statusP" value="Activo" required>
-                                </div>
-
-
-                            </form>
-                            <div class="modal-footer">
-                                <button type="submit" class="btn btn-primary" name="addPaciente" id="addPaciente">Agregar Paciente</button>
-                                <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#fileAddPaciente">
-                                    <i class="bi bi-filetype-exe"></i> Importar
-                                </button>
-                                <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-
-            <div class="modal" id="fileAddPaciente" tabindex="-1">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title">Importar Archivo</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="clearFileInputAddPaciente();"></button>
-                        </div>
-                        <div class="modal-body">
-                            <input type="file" id="fileInputAddPaciente" accept=".xls,.xlsx" onchange="updateFileNameAddPaciente();" />
-                            <p id="fileNameAddPaciente">No se ha seleccionado ningún archivos.</p>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="clearFileInputAddPaciente();">Cerrar</button>
-                            <button type="button" class="btn btn-primary" onclick="submitForm();">Cargar Achivo</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </main>
-
-
-
 
 
     </div>

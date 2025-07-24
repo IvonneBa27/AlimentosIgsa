@@ -19,7 +19,6 @@ $fechaFiltro = isset($_GET['fechaFiltro']) && !empty($_GET['fechaFiltro']) ? $_G
 $results_per_page = 15;
 
 // Obtener el número total de registros
-/*$total_query = "SELECT COUNT(*) AS total FROM dietas WHERE (area = 'CIRUGÍA GENERAL' OR area = 'Privados') AND DATE(Fecha_Hora_Creacion) = '$fechaFiltro'";*/
 $total_query = "SELECT COUNT(*) AS total FROM dietas WHERE area = 'CIRUGÍA GENERAL' AND DATE(Fecha_Hora_Creacion) = '$fechaFiltro'";
 $total_result = mysqli_query($con, $total_query);
 $total_row = mysqli_fetch_assoc($total_result);
@@ -34,9 +33,6 @@ $page = isset($_GET['page']) ? $_GET['page'] : 1;
 // Calcular el inicio del registro para la consulta 
 $start_from = ($page - 1) * $results_per_page;
 
-//$consulta = "SELECT * FROM dietas WHERE (area = 'CIRUGÍA GENERAL' OR area = 'Privados') AND DATE (Fecha_Hora_Creacion) = '$fechaFiltro' ORDER BY ID DESC LIMIT $start_from, $results_per_page";
-/*$consulta = "SELECT * FROM dietas WHERE area = 'CIRUGÍA GENERAL' AND DATE (Fecha_Hora_Creacion) = '$fechaFiltro' 
-ORDER BY ID DESC LIMIT $start_from, $results_per_page";*/
 $consulta = "SELECT * FROM dietas p WHERE area = 'CIRUGÍA GENERAL' AND DATE (Fecha_Hora_Creacion) = '$fechaFiltro' 
 ORDER BY 
   CASE 
@@ -110,7 +106,7 @@ $query = mysqli_query($con, $consulta);
       </div>
     </div>
 
-    <canvas class="my-4 w-100" id="myChart" width="900" height="200"></canvas>
+    <canvas class="my-4 w-100" id="myChart" width="900" height="150"></canvas>
 
     <h4>Dietas Solicitadas</h4>
     <div class="pagination">
@@ -170,7 +166,7 @@ $query = mysqli_query($con, $consulta);
               <td class="text-center"><?php echo $dataRow["Control_Tamizaje"]; ?></td>
               <td class="text-center"><?php echo $dataRow["Creado_por"]; ?></td>
               <?php
-              //$nota = "SELECT * FROM notas WHERE idDieta = '" . $dataRow['ID'] . "'";
+
               $nota = "SELECT * FROM notas WHERE idDieta = '" . $dataRow['ID'] . "' AND DATE(Fecha_Creacion) = '$fechaHoraActual'";
               $queryNota = mysqli_query($con, $nota);
               $notaExists = mysqli_num_rows($queryNota) > 0;

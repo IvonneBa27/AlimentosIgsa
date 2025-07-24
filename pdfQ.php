@@ -43,7 +43,7 @@ if ($query->num_rows > 0) {
 }
 
 $html = '<h1 style="text-align: center;">Reporte de Dietas (Quemados)</h1>';
-$html .= '<table border="1" style="width: 100%; border-collapse: collapse; font-size: 10px;">';
+$html .= '<table border="1" style="width: 100%; border-collapse: collapse; font-size: 7px;">';
 $html .= '<thead>
             <tr>
               <th>Fecha de Solicitud</th>

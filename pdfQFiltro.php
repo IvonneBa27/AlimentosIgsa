@@ -24,7 +24,7 @@ $consulta = "SELECT * FROM dietas WHERE area = 'QUEMADOS' AND DATE(Fecha_Hora_Cr
 $query = mysqli_query($con, $consulta);
 
 $html = '<h1 style="text-align: center;">Reporte de Dietas</h1>';
-$html .= '<table border="1" style="width:100%; border-collapse: collapse; font-size: 10px;">';
+$html .= '<table border="1" style="width:100%; border-collapse: collapse; font-size: 7px;">';
 $html .= '<thead>
             <tr>
               <th>Fecha de Solicitud</th>

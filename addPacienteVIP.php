@@ -3,18 +3,18 @@
 include('conexion.php');
 
 // Obtener los datos del formulario
-$nombrePaciente = $_POST['nombrePaciente'];
+$nombrePaciente = strtoupper($_POST['nombrePaciente']);
 $fechaNac = $_POST['fechaNac'];
 $idPaciente = $_POST['idPaciente'];
 $cama = $_POST['cama'];
 $edadAnios = $_POST['edadAnios'];
 $edadMeses = $_POST['edadMeses'];
 $edadDias = $_POST['edadDias'];
-$diagMed = $_POST['diagMed'];
-$presNutri = $_POST['presNutri'];
+$diagMed = strtoupper($_POST['diagMed']);
+$presNutri = strtoupper($_POST['presNutri']);
 $vip = $_POST['vip'];
-$observaciones = $_POST['observaciones'];
-$controlTami = $_POST['controlTami'];
+$observaciones = strtoupper($_POST['observaciones']);
+$controlTami = strtoupper($_POST['controlTami']);
 $nombreUsuario = $_POST['nombreUsuario'];
 $statusP = $_POST['statusP'];
 
