@@ -16,6 +16,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $sql = "
             SELECT ca.id, tu.tipo_usuario, 
                 cm.imagePath,
+                e.nombre as empresa,
                 ca.num_empleado,
                 cm.nombre_completo,
                 p.producto AS tipo_producto,
@@ -25,6 +26,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 cs.status AS estatus
             FROM control_alimentos ca
             LEFT JOIN comensal cm ON ca.barcode = cm.barcode
+            LEFT JOIN empresa e ON cm.empresa = e.id
             LEFT JOIN producto p ON ca.tipo_producto = p.id
             LEFT JOIN tipo_usuario tu ON cm.tipo_usuario = tu.id
             LEFT JOIN catalog_status cs ON ca.estatus_id = cs.status_id
@@ -62,22 +64,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if ($totalMinutes >= 480 && $totalMinutes <= 660) {
             $tipo_producto = 1;
             $tipoProductoNombre = "DESAYUNO";
-        } elseif ($totalMinutes >= 661 && $totalMinutes <= 1020) {
+        } elseif ($totalMinutes >= 780 && $totalMinutes <= 1020) {
             $tipo_producto = 2;
             $tipoProductoNombre = "COMIDA";
-        } elseif ($totalMinutes >= 1021 && $totalMinutes <= 1439) {
+        } elseif ($totalMinutes >= 1290 && $totalMinutes <= 1410) {
             $tipo_producto = 3;
             $tipoProductoNombre = "CENA";
-        } elseif ($totalMinutes >= 0 && $totalMinutes < 480) {
+        } elseif ($totalMinutes >= 0 && $totalMinutes <= 120) {
             $tipo_producto = 4;
             $tipoProductoNombre = "COLACIÓN NOCTURNA";
         } else {
             echo json_encode([
                 "success" => false,
-                "message" => "Fuera de horario de servicio. Los horarios son:\n- Desayuno: 08:00 - 11:00\n- Comida: 13:00 - 16:00\n- Cena: 21:30 - 23:30\n- Colación: 00:00 - 02:00"
+                "message" => "Fuera de horario de servicio. Los horarios son:\n- Desayuno: 08:00 - 11:00\n- Comida: 13:00 - 17:00\n- Cena: 21:30 - 23:30\n- Colación: 00:00 - 02:00"
             ]);
             exit;
         }
+
 
         // Buscar comensal solo si está activo
         $sql = "
@@ -111,6 +114,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         // Validar turnos
         $turnosActivos = (int)$comensal['t_desayuno'] + (int)$comensal['t_comida'] + (int)$comensal['t_cena'] + (int)$comensal['t_colacion'];
+        // Si no tiene ningún turno activo, no tiene derecho a registro
+        if ($turnosActivos === 0) {
+            header('Content-Type: application/json');
+            echo json_encode([
+                'success' => false,
+                'message' => 'El comensal no tiene turnos activos asignados para hoy.'
+            ]);
+            exit;
+        }
+
 
         if ($turnosActivos === 1) {
             $sql_verificar = "
@@ -164,6 +177,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             SELECT ca.id, tu.tipo_usuario, 
                 cm.imagePath,
                 ca.num_empleado,
+                e.nombre as empresa,
                 cm.nombre_completo,
                 p.producto AS tipo_producto,
                 ca.cantidad,
@@ -172,6 +186,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 cs.status AS estatus
             FROM control_alimentos ca
             LEFT JOIN comensal cm ON ca.barcode = cm.barcode
+            LEFT JOIN empresa e ON cm.empresa = e.id
             LEFT JOIN producto p ON ca.tipo_producto = p.id
             LEFT JOIN tipo_usuario tu ON cm.tipo_usuario = tu.id
             LEFT JOIN catalog_status cs ON ca.estatus_id = cs.status_id
