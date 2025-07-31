@@ -98,6 +98,7 @@ $sesionNombre = $sesi['nombre'];   // Reemplaza con el nombre exacto de la colum
                         <thead class="thead-dark">
                             <tr>
                                 <th>#</th>
+                                <th>Empresa</th>
                                 <th>Número de Empleado</th>
                                 <th>Nombre del Comensal</th>
                                 <th>Tipo de Comida</th>
@@ -200,6 +201,7 @@ $sesionNombre = $sesi['nombre'];   // Reemplaza con el nombre exacto de la colum
                                     tbody.append(`
                                     <tr>
                                         <td>${registro.id}</td>
+                                        <td>${registro.empresa}</td>
                                         <td>${registro.num_empleado}</td>
                                         <td>${registro.nombre_completo}</td>
                                         <td>${registro.tipo_producto}</td>
