@@ -304,58 +304,6 @@ $sesionNombre = $sesi['nombre'];   // Reemplaza con el nombre exacto de la colum
 
                     function imprimirTicket(data) {
                         const ticketContent = `
-<<<<<<<<< Temporary merge branch 1
-                                <!DOCTYPE html>
-                                <html>
-                                <head>
-                                    <title>Ticket</title>
-                                    <style>
-                                        html, body {
-                                            margin: 0 !important;
-                                            padding: 0 !important;
-                                            font-family: Arial, sans-serif;
-                                            font-size: 13px;
-                                            width: 80mm;
-                                            text-align: center;
-                                            line-height: 1.2;
-                                        }
-
-                                        @media print {
-                                            @page {
-                                                size: 80mm auto;
-                                                margin: 0;
-                                            }
-                                            html, body {
-                                                margin: 0 !important;
-                                                padding: 0 !important;
-                                            }
-                                        }
-
-                                        .ticket {
-                                            margin: 0;
-                                            padding: 0;
-                                        }
-
-                                        p {
-                                            margin: 0;
-                                            padding: 2px 0;
-                                            font-size: 13px;
-                                        }
-                                    </style>
-                                </head>
-                                <body>
-                                    <div class="ticket">
-                                        <p><strong>Número de empleado:</strong> ${data.num_empleado}</p>
-                                        <p><strong>Nombre:</strong> ${data.nombre_completo}</p>
-                                        <p><strong>Empresa:</strong> ${data.empresa}</p>
-                                        <p><strong>Descripción:</strong> ${data.tipo_producto}</p>
-                                        <p><strong>Cantidad:</strong> ${data.cantidad}</p>
-                                        <p><strong>Fecha de registro:</strong> ${data.fecha_registro}</p>
-                                    </div>
-                                </body>
-                                </html>
-                            `;
-=========
                                               <!DOCTYPE html>
                                               <html>
                                               <head>
@@ -406,7 +354,6 @@ $sesionNombre = $sesi['nombre'];   // Reemplaza con el nombre exacto de la colum
                                               </body>
                                               </html>
                                           `;
->>>>>>>>> Temporary merge branch 2
 
                         const printWindow = window.open('', 'PRINT', 'width=400,height=600');
                         printWindow.document.write(ticketContent);
@@ -466,12 +413,8 @@ $sesionNombre = $sesi['nombre'];   // Reemplaza con el nombre exacto de la colum
         </main>
 
     </div>
-<<<<<<<<< Temporary merge branch 1
-    <script src="https://cdn.jsdelivr.net/npm/qz-tray@2.1.0/qz-tray.js"></script>
-=========
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
->>>>>>>>> Temporary merge branch 2
     <script src="node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="node_modules/chart.js/dist/chart.umd.js"></script>
     <script src="js/sidebars.js"></script>
