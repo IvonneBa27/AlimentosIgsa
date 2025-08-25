@@ -27,6 +27,14 @@ $stmtDepartamentos->execute();
 $departamentos = $stmtDepartamentos->fetchAll(PDO::FETCH_ASSOC);
 
 
+// Obtener las empresas para el select
+$sqlComensales = "SELECT id, nombre_completo, correo  FROM comensal WHERE estatus = 1";
+$stmtComensales = $conn->prepare($sqlComensales);
+$stmtComensales->execute();
+$comensales = $stmtComensales->fetchAll(PDO::FETCH_ASSOC);
+
+
+
 ?>
 
 
@@ -59,12 +67,12 @@ $departamentos = $stmtDepartamentos->fetchAll(PDO::FETCH_ASSOC);
         <!-- ========== MAIN CONTENT ========== -->
         <main class="main-content">
             <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                <h3 class="h2">CORTESÍAS</h3>
+                <h3 class="h2">SERVICIO TELEFÓNICO</h3>
                 <div class="btn-toolbar mb-2 mb-md-0">
 
                     <form action="">
                         <div class="btn-group me-2">
-                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="location.href = 'operacionRegistroCortesias.php';">
+                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="location.href = 'operacionRegistroTelefonico.php';">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-clockwise" viewBox="0 0 16 16">
                                     <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2z" />
                                     <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466" />
@@ -104,8 +112,8 @@ $departamentos = $stmtDepartamentos->fetchAll(PDO::FETCH_ASSOC);
                                 <th>Empresa</th>
                                 <th>Area</th>
                                 <th>Solicitante</th>
-                                <th>Tipo de Comida</th>
-                                <th>Cantidad</th>
+                                <th>Comensal</th>
+                                <th>Tipo de Comida</th> 
                                 <th>Fecha y Hora</th>
                                 <th>Estatus</th>
                                 <th>Acción</th>
@@ -127,7 +135,7 @@ $departamentos = $stmtDepartamentos->fetchAll(PDO::FETCH_ASSOC);
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                         </div>
                         <div class="modal-body">
-                            <form action="register_cortesias.php" method="POST" enctype="multipart/form-data">
+                            <form id="formRegistroTelefonico" action="register_telefonico.php" method="POST" enctype="multipart/form-data">
                                 <div class="col-8">
                                     <label for="empresa" class="form-label">Empresa *</label>
                                     <select id="empresa" name="empresa" class="form-select" required>
@@ -144,14 +152,44 @@ $departamentos = $stmtDepartamentos->fetchAll(PDO::FETCH_ASSOC);
                                         <!-- Los departamentos se cargarán dinámicamente -->
                                     </select>
                                 </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Comensales *</label>
+                                    <div id="listaComensales" style="border: 1px solid #ccc; max-height: 200px; overflow-y: auto; padding: 10px;">
+                                        <p class="text-muted">Seleccione primero empresa y departamento.</p>
+                                    </div>
+                                </div>
                                 <div class="mb-3">
                                     <label for="solicitante" class="form-label">Solicitante</label>
-                                    <input type="text" id="solicitante" name="solicitante" class="form-control" required>
+                                    <input type="text" id="solicitante" name="solicitante" class="form-control" required style="text-transform: uppercase;">
+
                                 </div>
                                 <div class="mb-3">
-                                    <label for="cantidad" class="form-label">Cantidad</label>
-                                    <input type="number" class="form-control" id="cantidad" name="cantidad" min="1" required>
+                                    <label for="tipo_producto" class="form-label">Tipo de producto</label>
+                                    <select id="tipo_producto" name="tipo_producto" class="form-select" required>
+                                        <option value="">Seleccione un tipo de producto</option>
+                                        <option value="DESAYUNO">DESAYUNO</option>
+                                        <option value="COMIDA">COMIDA</option>
+                                        <option value="CENA">CENA</option>
+                                        <option value="COLACION">COLACIÓN</option>
+
+                                    </select>
                                 </div>
+                                <div class="mb-3">
+                                    <label for="observaciones" class="form-label">Observaciones</label>
+                                    <textarea id="observaciones" name="observaciones"
+                                        class="form-control" rows="3" required
+                                        style="text-transform: uppercase;"
+                                        oninput="this.value = this.value.toUpperCase();"></textarea>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="ubicacion" class="form-label">Ubicación</label>
+                                    <input type="text" id="ubicacion" name="ubicacion" class="form-control" required style="text-transform: uppercase;">
+
+                                </div>
+
+
                                 <input type="hidden" id="codigoBarras">
                             </form>
                         </div>
@@ -164,7 +202,7 @@ $departamentos = $stmtDepartamentos->fetchAll(PDO::FETCH_ASSOC);
             </div>
 
 
-                     <!-- Modal para cambiar el estatus a "BAJA" -->
+            <!-- Modal para cambiar el estatus a "BAJA" -->
             <div class="modal fade" id="deleteComensalModal" tabindex="-1" aria-labelledby="deleteComensalModalLabel" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content">
@@ -194,11 +232,12 @@ $departamentos = $stmtDepartamentos->fetchAll(PDO::FETCH_ASSOC);
             <!-- Scripts -->
             <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
             <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
             <script>
                 document.addEventListener('DOMContentLoaded', function() {
                     const empresa = document.getElementById('empresa');
                     const depto = document.getElementById('departamento');
-
+                    const listaComensales = document.getElementById('listaComensales');
 
                     function fill(select, items, placeholder) {
                         select.innerHTML = `<option value="">${placeholder}</option>`;
@@ -212,24 +251,69 @@ $departamentos = $stmtDepartamentos->fetchAll(PDO::FETCH_ASSOC);
 
                     empresa.addEventListener('change', function() {
                         const id = this.value;
+                        listaComensales.innerHTML = '<p class="text-muted">Seleccione primero empresa y departamento.</p>';
+
                         if (!id) {
                             fill(depto, [], 'Seleccione un departamento');
                             return;
                         }
-                        // Departamentos
+                        // Cargar departamentos según empresa
                         fetch(`get_departments.php?empresa_id=${id}`)
                             .then(r => r.json())
-                            .then(data => fill(depto, data, 'Seleccione un departamento'))
-                            .catch(() => fill(depto, [], 'Seleccione un departamento'));
-
+                            .then(data => {
+                                fill(depto, data, 'Seleccione un departamento');
+                                listaComensales.innerHTML = '<p class="text-muted">Seleccione primero empresa y departamento.</p>';
+                            })
+                            .catch(() => {
+                                fill(depto, [], 'Seleccione un departamento');
+                                listaComensales.innerHTML = '<p class="text-muted">Seleccione primero empresa y departamento.</p>';
+                            });
                     });
-                });
 
-                $(document).ready(function() {
+                    document.getElementById('departamento').addEventListener('change', function() {
+                        const deptoId = this.value;
+                        const listaComensales = document.getElementById('listaComensales');
+
+                        if (!deptoId) {
+                            listaComensales.innerHTML = '<p class="text-muted">Selecciona un departamento.</p>';
+                            return;
+                        }
+
+                        fetch(`get_comensales.php?departamento=${deptoId}`)
+                            .then(res => res.json())
+                            .then(data => {
+                                console.log("Departamento seleccionado:", deptoId);
+                                console.log("Respuesta recibida:", data);
+
+                                if (!data.success || data.comensales.length === 0) {
+                                    listaComensales.innerHTML = '<p>No hay comensales.</p>';
+                                    return;
+                                }
+
+                                listaComensales.innerHTML = '';
+                                data.comensales.forEach(comensal => {
+                                    const item = `
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="comensales[]" value="${comensal.barcode}" id="comensal${comensal.barcode}">
+                                            <label class="form-check-label" for="comensal${comensal.id}">${comensal.nombre_completo}</label>
+                                        </div>`;
+                                    listaComensales.insertAdjacentHTML('beforeend', item);
+                                });
+                            })
+                            .catch((error) => {
+                                console.error("Error cargando comensales:", error);
+                                listaComensales.innerHTML = '<p>Error cargando comensales.</p>';
+                            });
+                    });
+
+
+
+
+                    // Tu código existente para el input barcode y la lógica de confirmación
+
                     let barcodeTimeout;
                     cargarRegistros();
 
-                    // Evento cuando el usuario escanea el código de barras
                     $('#barcodeInput').on('input', function() {
                         clearTimeout(barcodeTimeout); // Limpiar timeout anterior
                         const barcode = $(this).val().trim();
@@ -255,8 +339,7 @@ $departamentos = $stmtDepartamentos->fetchAll(PDO::FETCH_ASSOC);
                         }
                     });
 
-
-                      // ▶︎ Cancelar servicio (abre el modal con el ID)
+                    // Cancelar servicio (abre el modal con el ID)
                     $(document).on('click', '.btn-cancelar-servicio', function() {
                         const id = $(this).data('id');
                         $('#delete-comensal-id').val(id);
@@ -267,18 +350,22 @@ $departamentos = $stmtDepartamentos->fetchAll(PDO::FETCH_ASSOC);
                         e.preventDefault(); // Evita que el formulario se envíe normalmente
 
                         // Obtener datos del formulario
-                        const formData = {
-                            barcode: $("#codigoBarras").val(),
-                            empresa_id: $("#empresa").val(),
-                            departamento_id: $("#departamento").val(),
-                            solicitante: $("#solicitante").val(),
-                            cantidad: $("#cantidad").val()
-                        };
+                        const form = document.getElementById('formRegistroTelefonico');
+                        const formData = new FormData(form);
 
-                        console.log("Enviando datos:", formData);
+                        // Validar que al menos un comensal esté seleccionado
+                        const comensalesSeleccionados = formData.getAll('comensales[]');
+                        if (comensalesSeleccionados.length === 0) {
+                            return Swal.fire({
+                                icon: 'warning',
+                                title: 'Seleccione al menos un comensal',
+                                text: 'Por favor, seleccione al menos un comensal para continuar.',
+                                confirmButtonColor: '#ffc107'
+                            });
+                        }
 
-                        // Validación simple
-                        if (!formData.empresa_id || !formData.departamento_id || !formData.solicitante || !formData.cantidad) {
+                        // Validación simple para otros campos
+                        if (!formData.get('empresa') || !formData.get('departamento') || !formData.get('solicitante')) {
                             return Swal.fire({
                                 icon: 'warning',
                                 title: 'Campos incompletos',
@@ -287,11 +374,16 @@ $departamentos = $stmtDepartamentos->fetchAll(PDO::FETCH_ASSOC);
                             });
                         }
 
+                        // Agregar barcode al formData
+                        formData.append('barcode', $('#codigoBarras').val());
+
                         // Enviar datos con AJAX
                         $.ajax({
                             type: "POST",
-                            url: "register_cortesias.php",
+                            url: "register_telefonico.php",
                             data: formData,
+                            processData: false,
+                            contentType: false,
                             dataType: "json",
                             success: function(response) {
                                 console.log("Respuesta del servidor:", response);
@@ -307,6 +399,9 @@ $departamentos = $stmtDepartamentos->fetchAll(PDO::FETCH_ASSOC);
                                         $("#registroModal").modal("hide"); // Cierra modal
                                         $("#barcodeInput").val(""); // Limpia código
                                         cargarRegistros(); // Refresca tabla
+                                        listaComensales.innerHTML = '<p class="text-muted">Seleccione primero empresa y departamento.</p>';
+                                        depto.innerHTML = '<option value="">Seleccione un departamento</option>';
+                                        empresa.value = '';
                                     });
                                 } else {
                                     Swal.fire({
@@ -334,7 +429,7 @@ $departamentos = $stmtDepartamentos->fetchAll(PDO::FETCH_ASSOC);
                     // Función para cargar registros en la tabla
                     function cargarRegistros() {
                         $.ajax({
-                            url: "register_cortesias.php",
+                            url: "register_telefonico.php",
                             type: "POST",
                             data: {
                                 action: "get_registros_dia"
@@ -355,15 +450,15 @@ $departamentos = $stmtDepartamentos->fetchAll(PDO::FETCH_ASSOC);
                                 <td>${registro.nombre_empresa}</td>
                                 <td>${registro.nombre_departamento}</td>
                                 <td>${registro.solicitante}</td>
+                                <td>${registro.comensal}</td>
                                 <td>${registro.tipo_producto}</td>
-                                <td>${registro.cantidad}</td>
                                 <td>${registro.fecha_registro}</td>
                                 <td>${estatusHTML}</td>
-                                  <td>
-                                <button class="btn btn-dark btn-sm btn-cancelar-servicio" data-id="${registro.id}" data-bs-toggle="modal" data-bs-target="#deleteComensalModal">
-                                    Cancelar
-                                </button>
-                            </td>
+                                <td>
+                                    <button class="btn btn-dark btn-sm btn-cancelar-servicio" data-id="${registro.id}" data-bs-toggle="modal" data-bs-target="#deleteComensalModal">
+                                        Cancelar
+                                    </button>
+                                </td>
                             </tr>
                         `);
                                     });
