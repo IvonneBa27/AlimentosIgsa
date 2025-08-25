@@ -129,7 +129,7 @@ function toggleEdit(checkbox) {
     });
 }
 
-function guardarCambio(idPaciente, datos) {
+function guardarCambio(idPaciente, datos) { 
     // Guardar la posición del scroll antes de cualquier acción
     var contenedor = document.getElementById('contenedorScroll');
     localStorage.setItem('scrollTopContenedor', contenedor.scrollTop);
@@ -170,7 +170,7 @@ let columnaBloqueoVisible = false;
 function verificarYActualizarColumnaBloqueo(fechaHoraActual) {
     const hora = fechaHoraActual.getHours();
     const minutos = fechaHoraActual.getMinutes();
-    const dentroDelRango = (hora > 10 || (hora === 10 && minutos >= 10)) && hora < 21;
+    const dentroDelRango = (hora > 17 || (hora === 17 && minutos >= 30)) && hora < 21;
 
     const tabla = document.getElementById("miTabla");
 
@@ -181,7 +181,9 @@ function verificarYActualizarColumnaBloqueo(fechaHoraActual) {
             th.className = "text-center columna-bloqueo";
 
             if (index === 0) {
-                th.innerHTML = `<span>Solicitud día siguiente</span><br><button class="btn btn-success btn-sm mt-1" onclick="enviarDatosBloqueo()">Enviar datos</button>`;
+                th.innerHTML = `<span>Solicitud día siguiente</span><br><button class="btn btn-success btn-sm mt-1" onclick="enviarDatosBloqueo()">Enviar datos</button> 
+                                <br><button class="btn btn-primary btn-sm mt-1" onclick="window.open('pdfDesayunoCG.php', '_blank')">Exportar</button>`;  
+
             } else {
                 th.textContent = "Desayuno";
             }
@@ -197,7 +199,7 @@ function verificarYActualizarColumnaBloqueo(fechaHoraActual) {
             fila.appendChild(td);
         });
 
-        columnaBloqueoVisible = true;
+        columnaBloqueoVisible = true;    
     }
 }
 

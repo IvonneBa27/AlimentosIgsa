@@ -109,6 +109,63 @@ $ejecutar = mysqli_query($con, $pacientes);
                         </div>
                     </form>
 
+                    <form action="datosEtiquetaQ2.php" method="post" target="_blank">
+                        <div class="modal" tabindex="-1" id="ModalImpresora">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title text-center">Generar Etiquetas</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="CancelarImpresion()"></button>
+                                    </div>
+
+                                    <div class="col-sm-6" hidden>
+                                        <label for="firstName" class="form-label">Fecha y Hora</label>
+                                        <input type="datetime" id="fechaHoraActual" name="fechaHoraActual" readonly required>
+                                    </div>
+
+                                    <div class="col-sm-9">
+                                        <label class="form-label">Tiempo de Comida</label>
+                                        <select name="selectTipo" id="selectTipo" class="form-select" required>
+                                            <option value="">Seleccione una opción</option>
+                                            <option value="Desayuno">Desayuno</option>
+                                            <option value="Col_Matutina">Colación Matutina</option>
+                                            <option value="Comida">Comida</option>
+                                            <option value="Col_Vespertina">Colación Vespertina</option>
+                                            <option value="Cena">Cena</option>
+                                            <option value="Col_Nocturna">Colación Nocturna</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="col-sm-9">
+                                        <label class="form-label">Paciente</label>
+                                        <select name="selectPacientes[]" id="selectPacientes" class="form-select" multiple size="9" required>
+                                            <option value="Todos">Todos</option>
+                                            <?php
+                                            while ($row = mysqli_fetch_assoc($ejecutar)) {
+                                                echo "<option value='" . $row['nombre'] . "'>" . $row['nombre'] . "</option>";
+                                            }
+                                            ?>
+                                        </select>
+                                    </div>
+
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="CancelarImpresion()">Cancelar</button>
+                                        <button type="submit" class="btn btn-primary">Imprimir</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+
+
+                    <form method="get" action="checkListQ.php">
+                        <div class="btn-group me-2">
+                            <button id="checklist" type="submit" class="btn btn-sm btn-outline-secondary">
+                                <i class="bi bi-card-checklist"></i> Check List
+                            </button>
+                        </div>
+                    </form>
+
                     <form action="">
                         <div class="btn-group me-2">
                             <button type="button" class="btn btn-sm btn-outline-secondary" onclick="location.href = 'dietasQ.php';">
@@ -268,59 +325,6 @@ $ejecutar = mysqli_query($con, $pacientes);
                 </div>
             </div>
         </div>
-
-
-
-
-
-
-        <div class="modal" tabindex="-1" id="ModalImpresora">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title text-center">Generar Etiquetas</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="CancelarImpresion()"></button>
-                    </div>
-                    <form method="POST" action="datosEtiquetaQ.php" id="formImpresora">
-                        <div class="col-sm-6" hidden>
-                            <label for="firstName" class="form-label">Fecha y Hora</label>
-                            <input type="datetime" id="fechaHoraActual" name="fechaHoraActual" readonly required>
-                        </div>
-
-                        <div class="col-sm-6">
-                            <label for="" class="form-label">Tiempo de Comida</label>
-                            <select name="selectTipo" id="selectTipo" class="form-select">
-                                <option value="Desayuno">Desayuno</option>
-                                <option value="Col_Matutina">Colación Matutina</option>
-                                <option value="Comida">Comida</option>
-                                <option value="Col_Vespertina">Colación Vespertina</option>
-                                <option value="Cena">Cena</option>
-                                <option value="Col_Nocturna">Colación Nocturna</option>
-                            </select>
-                        </div>
-
-                        <div class="col-sm-6">
-                            <label for="" class="form-label">Paciente</label>
-                            <select name="selectPacientes" id="selectPacientes" class="form-select">
-                                <option value="Todos">Todos</option>
-                                <?php
-                                while ($row = mysqli_fetch_assoc($ejecutar)) {
-                                    echo "<option value='" . $row['nombre'] . "'>" . $row['nombre'] . "</option>";
-                                }
-                                ?>
-                            </select>
-                        </div>
-
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                            <button type="submit" class="btn btn-primary">Imprimir</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-
-
 
 
 

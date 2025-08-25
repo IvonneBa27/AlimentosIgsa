@@ -7,7 +7,7 @@ $fechaHoraActual = date("Y-m-d H:i:s");
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $fecha = date('Y-m-d', strtotime('+1 day'));
 
-    $query = "SELECT idPaciente, Desayuno FROM dietas WHERE DATE(Fecha_Hora_Creacion) = '$fecha' AND area = 'CIRUGÍA GENERAL'";
+    $query = "SELECT idPaciente, Desayuno FROM dietas WHERE DATE(Fecha_Hora_Creacion) = '$fecha' AND area = 'MEDICINA INTERNA'";
     $result = mysqli_query($con, $query);
 
     $datos = [];
