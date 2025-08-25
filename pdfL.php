@@ -75,12 +75,10 @@ if ($query->num_rows > 0) {
   echo "0 resultados";
 }
 
-$html = '<h1 style="text-align: center;">Reporte de Dietas (Lactantes)</h1>';
+$html = '<h2 style="text-align: center;">Reporte de Dietas (Lactantes)</h2>';
 $html .= '<table border="1" style="width: 100%; border-collapse: collapse; font-size: 7px;">';
 $html .= '<thead>
             <tr>
-              <th>Fecha de Solicitud</th>
-              <th>Área</th>
               <th>ID</th>
               <th>Nombre del Paciente</th>
               <th>Fecha de Nacimiento</th>
@@ -96,14 +94,11 @@ $html .= '<thead>
               <th>Colación Nocturna</th>
               <th>Observaciones</th>
               <th>Control de Tamizaje</th>
-              <th>Solicitado por</th>
             </tr>
           </thead>';
 $html .= '<tbody>';
 foreach ($datosCombinados as $dataRow) {
   $html .= '<tr>
-                <td>' . $dataRow["Fecha_Hora_Creacion"] . '</td>
-                <td>' . $dataRow["area_pacientes"] . '</td>
                 <td>' . $dataRow["pacienteID_pacientes"] . '</td>
                 <td>' . $dataRow["nombre"] . '</td>
                 <td>' . $dataRow["fechaNacimiento"] . '</td>
@@ -119,7 +114,6 @@ foreach ($datosCombinados as $dataRow) {
                 <td>' . $dataRow["Col_Nocturna"] . '</td>
                 <td>' . $dataRow["observaciones"] . '</td>
                 <td>' . $dataRow["controlTamizaje"] . '</td>
-                <td>' . $dataRow["Creado_por"] . '</td>
               </tr>';
 }
 $html .= '</tbody></table>';

@@ -12,18 +12,19 @@ $fin_semana = date('Y-m-d', strtotime('sunday this week', strtotime($fechaFiltro
 $sql = "SELECT 
     ds.nombre_dia,
     IFNULL(SUM(
-        (d.Desayuno IS NOT NULL AND d.Desayuno != '') +
-        (d.Col_Matutina IS NOT NULL AND d.Col_Matutina != '') +
-        (d.Comida IS NOT NULL AND d.Comida != '') +
-        (d.Col_Vespertina IS NOT NULL AND d.Col_Vespertina != '') +
-        (d.Cena IS NOT NULL AND d.Cena != '') +
-        (d.Col_Nocturna IS NOT NULL AND d.Col_Nocturna != '')
+        (d.Desayuno IS NOT NULL AND d.Desayuno != '' AND UPPER(TRIM(d.Desayuno)) != 'AYUNO') +
+        (d.Col_Matutina IS NOT NULL AND d.Col_Matutina != '' AND UPPER(TRIM(d.Col_Matutina)) != 'AYUNO') +
+        (d.Comida IS NOT NULL AND d.Comida != '' AND UPPER(TRIM(d.Comida)) != 'AYUNO') +
+        (d.Col_Vespertina IS NOT NULL AND d.Col_Vespertina != '' AND UPPER(TRIM(d.Col_Vespertina)) != 'AYUNO') +
+        (d.Cena IS NOT NULL AND d.Cena != '' AND UPPER(TRIM(d.Cena)) != 'AYUNO') +
+        (d.Col_Nocturna IS NOT NULL AND d.Col_Nocturna != '' AND UPPER(TRIM(d.Col_Nocturna)) != 'AYUNO')
     ), 0) AS cantidad
 FROM 
     dias_semana ds
 LEFT JOIN 
     dietas d ON DAYOFWEEK(DATE(d.Fecha_Hora_Creacion)) = ds.dia_semana
-    AND DATE(d.Fecha_Hora_Creacion) BETWEEN '$inicio_semana' AND '$fin_semana' AND area = 'UTIP'
+    AND DATE(d.Fecha_Hora_Creacion) BETWEEN '$inicio_semana' AND '$fin_semana' 
+    AND d.area = 'UTIP'
 GROUP BY 
     ds.dia_semana
 ORDER BY 

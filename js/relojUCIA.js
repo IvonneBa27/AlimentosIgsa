@@ -188,7 +188,8 @@ function verificarYActualizarColumnaBloqueo(fechaHoraActual) {
             th.className = "text-center columna-bloqueo";
 
             if (index === 0) {
-                th.innerHTML = `<span>Solicitud día siguiente</span><br><button class="btn btn-success btn-sm mt-1" onclick="enviarDatosBloqueo()">Enviar datos</button>`;
+                th.innerHTML = `<span>Solicitud día siguiente</span><br><button class="btn btn-success btn-sm mt-1" onclick="enviarDatosBloqueo()">Enviar datos</button>
+                                <br><button class="btn btn-primary btn-sm mt-1" onclick="window.open('pdfDesayunoUCIA.php', '_blank')">Exportar</button>`;
             } else {
                 th.textContent = "Desayuno";
             }

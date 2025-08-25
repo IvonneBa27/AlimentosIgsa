@@ -57,3 +57,34 @@ function guardarNota() {
         }
     });
 }
+
+
+
+
+document.addEventListener("DOMContentLoaded", function () {
+    const checkboxes = document.querySelectorAll(".custom-checkbox");
+
+    checkboxes.forEach(checkbox => {
+        checkbox.addEventListener("change", function () {
+            const idPaciente = checkbox.getAttribute("data-id");
+            const comida = checkbox.getAttribute("data-comida");
+            const seleccionado = checkbox.checked ? 1 : 0;
+
+            fetch("guardar_checkboxG.php", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: `idPaciente=${idPaciente}&comida=${comida}&seleccionado=${seleccionado}`
+            })
+            .then(response => response.text())
+            .then(data => {
+                console.log("Guardado:", data);
+            })
+            .catch(error => {
+                console.error("Error al guardar:", error);
+            });
+        });
+    });
+});
+
